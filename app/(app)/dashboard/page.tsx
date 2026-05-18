@@ -2,16 +2,16 @@
 
 import Topbar from "@/components/Topbar";
 import {
-  MessageSquare,
-  Users,
-  TrendingUp,
-  DollarSign,
-  Clock,
-  Target,
-  ArrowUp,
-  ArrowDown,
-  MoreHorizontal,
+  MessageSquare, Users, TrendingUp, DollarSign, Clock, Target, ArrowUp, ArrowDown, MoreHorizontal,
 } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+const convData = [
+  { hora: "8h", conversas: 18 }, { hora: "9h", conversas: 34 }, { hora: "10h", conversas: 52 },
+  { hora: "11h", conversas: 41 }, { hora: "12h", conversas: 28 }, { hora: "13h", conversas: 19 },
+  { hora: "14h", conversas: 45 }, { hora: "15h", conversas: 61 }, { hora: "16h", conversas: 48 },
+  { hora: "17h", conversas: 37 }, { hora: "18h", conversas: 22 },
+];
 
 const kpis = [
   {
@@ -130,6 +130,29 @@ export default function DashboardPage() {
 
         {/* Middle row */}
         <div className="grid grid-cols-3 gap-4">
+          {/* Conversas por hora */}
+          <div className="col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-[#111827]">Conversas por Hora</h3>
+              <span className="text-xs text-gray-400">Hoje</span>
+            </div>
+            <ResponsiveContainer width="100%" height={120}>
+              <AreaChart data={convData}>
+                <defs>
+                  <linearGradient id="gradConv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6C3BFF" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#6C3BFF" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="hora" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                <YAxis hide />
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #e5e7eb" }} />
+                <Area type="monotone" dataKey="conversas" stroke="#6C3BFF" strokeWidth={2} fill="url(#gradConv)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
           {/* Funil de vendas */}
           <div className="col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
