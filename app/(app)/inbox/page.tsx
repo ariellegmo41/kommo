@@ -42,22 +42,22 @@ interface Conversation {
 const conversations: Conversation[] = [
   {
     id: "1",
-    contact: "Maria Fernanda",
-    avatar: "M",
+    contact: "Fernanda Lima",
+    avatar: "F",
     channel: "whatsapp",
-    lastMessage: "Olá! Preciso de informações sobre o plano...",
+    lastMessage: "Oi! Tem o Vestido Midi Floral no tamanho P?",
     time: "agora",
     unread: 3,
-    tags: ["VIP", "Interessado"],
+    tags: ["VIP", "Quente"],
     status: "open",
     assignee: "Carla",
   },
   {
     id: "2",
-    contact: "João Paulo",
-    avatar: "J",
+    contact: "Camila Rodrigues",
+    avatar: "C",
     channel: "instagram",
-    lastMessage: "Qual o preço do plano empresarial?",
+    lastMessage: "Amei o Conjunto Alfaiataria! Tem em bege?",
     time: "2min",
     unread: 1,
     tags: ["Novo"],
@@ -65,59 +65,59 @@ const conversations: Conversation[] = [
   },
   {
     id: "3",
-    contact: "Ana Costa",
-    avatar: "A",
-    channel: "telegram",
-    lastMessage: "Perfeito! Vou fechar agora mesmo.",
+    contact: "Larissa Mendes",
+    avatar: "L",
+    channel: "whatsapp",
+    lastMessage: "Quero fazer uma troca, a blusa ficou grande.",
     time: "15min",
     unread: 0,
-    tags: ["Quente"],
+    tags: ["Troca"],
     status: "open",
-    assignee: "Bruno",
+    assignee: "Ana",
   },
   {
     id: "4",
-    contact: "Carlos Alves",
-    avatar: "C",
-    channel: "messenger",
-    lastMessage: "Preciso de um desconto...",
+    contact: "Priscila Tavares",
+    avatar: "P",
+    channel: "tiktok",
+    lastMessage: "Vi no TikTok! Quanto é o Blazer Oversized?",
     time: "1h",
     unread: 0,
-    tags: ["Negociação"],
+    tags: ["TikTok", "Novo"],
     status: "pending",
   },
   {
     id: "5",
-    contact: "Empresa XYZ Ltda",
-    avatar: "E",
-    channel: "whatsapp",
-    lastMessage: "Quando podemos marcar a demo?",
+    contact: "Rafaela Santos",
+    avatar: "R",
+    channel: "instagram",
+    lastMessage: "Quero montar um look completo para formatura",
     time: "2h",
     unread: 0,
-    tags: ["Lead Quente", "B2B"],
+    tags: ["Consultoria", "VIP"],
     status: "open",
-    assignee: "Diego",
+    assignee: "Carla",
   },
   {
     id: "6",
-    contact: "Patricia Sousa",
-    avatar: "P",
-    channel: "email",
-    lastMessage: "Re: Proposta comercial enviada",
+    contact: "Tatiane Oliveira",
+    avatar: "T",
+    channel: "whatsapp",
+    lastMessage: "Pagamento via PIX tem desconto?",
     time: "3h",
     unread: 0,
-    tags: ["Proposta"],
+    tags: ["Negociação"],
     status: "pending",
   },
 ];
 
 const messages = [
-  { id: 1, from: "contact", text: "Olá! Preciso de informações sobre o plano empresarial.", time: "09:12", read: true },
-  { id: 2, from: "agent", text: "Olá Maria! Tudo bem? Ficamos felizes com seu interesse! 😊\n\nNosso plano empresarial inclui atendimento omnichannel, CRM integrado e IA para qualificação automática.", time: "09:14", read: true },
-  { id: 3, from: "contact", text: "Que ótimo! E qual o valor?", time: "09:15", read: true },
-  { id: 4, from: "agent", text: "O plano empresarial começa em R$ 497/mês com até 5 usuários. Posso te enviar nossa proposta detalhada?", time: "09:16", read: true },
-  { id: 5, from: "contact", text: "Sim, por favor! E tem teste gratuito?", time: "09:18", read: true },
-  { id: 6, from: "contact", text: "Olá! Preciso de informações sobre o plano...", time: "09:20", read: false },
+  { id: 1, from: "contact", text: "Oi! Vi no Instagram o Vestido Midi Floral. Tem no tamanho P?", time: "09:12", read: true },
+  { id: 2, from: "agent", text: "Olá Fernanda! Tudo bem? Que ótimo que gostou! 😍\n\nSim, o Vestido Midi Floral ainda temos disponível no tamanho P! Ele é lindo e fica perfeito para eventos e jantares.", time: "09:13", read: true },
+  { id: 3, from: "contact", text: "Perfeito! Qual o valor e vocês entregam em SP?", time: "09:15", read: true },
+  { id: 4, from: "agent", text: "O Vestido Midi Floral está por R$ 459 e sim, entregamos para todo o Brasil! Para São Paulo o prazo é de 2 a 3 dias úteis via Jadlog. Quer garantir o seu?", time: "09:16", read: true },
+  { id: 5, from: "contact", text: "Sim! Aceita Pix? E tem como parcelar também?", time: "09:19", read: true },
+  { id: 6, from: "contact", text: "Oi! Tem o Vestido Midi Floral no tamanho P?", time: "09:21", read: false },
 ];
 
 const channelIcons: Record<Channel, { icon: typeof MessageCircle; color: string; label: string }> = {
@@ -130,23 +130,23 @@ const channelIcons: Record<Channel, { icon: typeof MessageCircle; color: string;
 };
 
 const avatarColors: Record<string, string> = {
-  M: "bg-[#6C3BFF]",
-  J: "bg-[#10B981]",
-  A: "bg-amber-500",
-  C: "bg-[#7B61FF]",
-  E: "bg-blue-500",
+  F: "bg-[#6C3BFF]",
+  C: "bg-[#10B981]",
+  L: "bg-amber-500",
   P: "bg-rose-500",
+  R: "bg-[#7B61FF]",
+  T: "bg-teal-500",
 };
 
 const tagColors: Record<string, string> = {
   VIP: "bg-amber-100 text-amber-700",
-  Interessado: "bg-blue-100 text-blue-700",
-  Novo: "bg-green-100 text-green-700",
   Quente: "bg-rose-100 text-rose-700",
+  Novo: "bg-green-100 text-green-700",
+  Troca: "bg-orange-100 text-orange-700",
+  TikTok: "bg-gray-100 text-gray-700",
+  Instagram: "bg-pink-100 text-pink-700",
+  Consultoria: "bg-[#6C3BFF]/10 text-[#6C3BFF]",
   Negociação: "bg-purple-100 text-purple-700",
-  "Lead Quente": "bg-rose-100 text-rose-700",
-  B2B: "bg-gray-100 text-gray-700",
-  Proposta: "bg-orange-100 text-orange-700",
 };
 
 const filters = ["Todos", "Abertos", "Pendentes", "Resolvidos", "Não lidos"];
@@ -263,7 +263,7 @@ export default function InboxPage() {
         <div className="mx-4 mt-3 px-3 py-2 bg-[#6C3BFF]/10 border border-[#6C3BFF]/20 rounded-lg flex items-center gap-2 flex-shrink-0">
           <Bot size={14} className="text-[#6C3BFF]" />
           <p className="text-xs text-[#6C3BFF] flex-1">
-            <strong>IA sugere:</strong> &quot;Olá Maria! Temos um teste gratuito de 14 dias. Posso ativar para você agora?&quot;
+            <strong>IA sugere:</strong> &quot;Sim Fernanda! Aceitamos Pix com 5% de desconto e parcelamos em até 6x no cartão sem juros. Posso reservar o vestido para você?&quot;
           </p>
           <button className="text-xs text-[#6C3BFF] font-medium hover:underline flex-shrink-0">Usar</button>
         </div>
@@ -415,7 +415,7 @@ export default function InboxPage() {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Resumo da IA</p>
               <div className="bg-[#6C3BFF]/5 rounded-lg p-3">
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Contato com alto interesse no plano empresarial. Solicitou informações sobre preço e teste gratuito. Perfil: decisor, empresa de médio porte.
+                  Cliente VIP recorrente. Interesse em Vestido Midi Floral P. Perguntou sobre Pix e parcelamento. Alta probabilidade de conversão.
                 </p>
               </div>
             </div>
@@ -425,7 +425,7 @@ export default function InboxPage() {
         {activeTab === "pipeline" && (
           <div className="p-4 space-y-3">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Etapa Atual</p>
-            {["Novo Lead", "Qualificando", "Proposta", "Negociação", "Fechado"].map((stage, i) => (
+            {["Novo Interesse", "Consultoria de Estilo", "Proposta Enviada", "Aguardando Pagamento", "Pedido Confirmado"].map((stage, i) => (
               <div key={stage} className="flex items-center gap-2">
                 <div className={cn(
                   "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold",

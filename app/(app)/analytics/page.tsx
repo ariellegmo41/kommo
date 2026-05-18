@@ -10,52 +10,51 @@ import { TrendingUp, TrendingDown, DollarSign, Users, Target, Clock } from "luci
 import { cn } from "@/lib/utils";
 
 const revenueData = [
-  { mes: "Jan", receita: 52000, meta: 60000, leads: 890 },
-  { mes: "Fev", receita: 61000, meta: 62000, leads: 1020 },
-  { mes: "Mar", receita: 55000, meta: 65000, leads: 940 },
-  { mes: "Abr", receita: 74000, meta: 68000, leads: 1280 },
-  { mes: "Mai", receita: 87400, meta: 72000, leads: 1432 },
+  { mes: "Jan", receita: 28400, meta: 30000, leads: 410 },
+  { mes: "Fev", receita: 31200, meta: 32000, leads: 487 },
+  { mes: "Mar", receita: 27800, meta: 33000, leads: 392 },
+  { mes: "Abr", receita: 36900, meta: 35000, leads: 560 },
+  { mes: "Mai", receita: 43480, meta: 38000, leads: 643 },
 ];
 
 const weeklyLeads = [
-  { dia: "Seg", whatsapp: 42, instagram: 28, email: 12, outros: 8 },
-  { dia: "Ter", whatsapp: 55, instagram: 31, email: 18, outros: 5 },
-  { dia: "Qua", whatsapp: 38, instagram: 22, email: 14, outros: 11 },
-  { dia: "Qui", whatsapp: 67, instagram: 45, email: 20, outros: 9 },
-  { dia: "Sex", whatsapp: 72, instagram: 38, email: 16, outros: 14 },
-  { dia: "Sáb", whatsapp: 31, instagram: 52, email: 8, outros: 6 },
-  { dia: "Dom", whatsapp: 18, instagram: 41, email: 4, outros: 3 },
+  { dia: "Seg", whatsapp: 28, instagram: 42, email: 3, outros: 9  },
+  { dia: "Ter", whatsapp: 34, instagram: 51, email: 4, outros: 7  },
+  { dia: "Qua", whatsapp: 21, instagram: 38, email: 2, outros: 12 },
+  { dia: "Qui", whatsapp: 45, instagram: 62, email: 5, outros: 8  },
+  { dia: "Sex", whatsapp: 52, instagram: 73, email: 6, outros: 14 },
+  { dia: "Sáb", whatsapp: 38, instagram: 88, email: 2, outros: 18 },
+  { dia: "Dom", whatsapp: 22, instagram: 67, email: 1, outros: 11 },
 ];
 
 const funnelConversion = [
-  { stage: "Visitantes", count: 12430 },
-  { stage: "Leads", count: 1432 },
-  { stage: "Qualificados", count: 654 },
-  { stage: "Propostas", count: 228 },
-  { stage: "Convertidos", count: 352 },
+  { stage: "Visualizações", count: 8240 },
+  { stage: "Mensagens",     count: 1843 },
+  { stage: "Consultorias",  count: 648  },
+  { stage: "Propostas",     count: 203  },
+  { stage: "Pedidos",       count: 87   },
 ];
 
 const originPie = [
-  { name: "WhatsApp", value: 42, color: "#25D366" },
-  { name: "Instagram", value: 26, color: "#E1306C" },
-  { name: "Email", value: 14, color: "#6C3BFF" },
-  { name: "Messenger", value: 10, color: "#0099FF" },
-  { name: "Outros", value: 8, color: "#9ca3af" },
+  { name: "Instagram", value: 38, color: "#E1306C" },
+  { name: "WhatsApp",  value: 34, color: "#25D366" },
+  { name: "TikTok",    value: 16, color: "#111827" },
+  { name: "Indicação", value: 9,  color: "#6C3BFF" },
+  { name: "Outros",    value: 3,  color: "#9ca3af" },
 ];
 
 const sellerPerf = [
-  { name: "Carla", deals: 28, revenue: 42100, conv: 34 },
-  { name: "Bruno", deals: 22, revenue: 35600, conv: 28 },
-  { name: "Ana", deals: 19, revenue: 29800, conv: 24 },
-  { name: "Diego", deals: 15, revenue: 21400, conv: 19 },
-  { name: "Fernanda", deals: 12, revenue: 18500, conv: 15 },
+  { name: "Carla",   deals: 34, revenue: 9248,  conv: 34 },
+  { name: "Ana B.",  deals: 28, revenue: 7612,  conv: 28 },
+  { name: "Juliana", deals: 19, revenue: 5130,  conv: 19 },
+  { name: "Beatriz", deals: 6,  revenue: 1490,  conv: 6  },
 ];
 
 const kpis = [
-  { label: "Taxa de Conversão", value: "24,6%", change: "+3,2%", up: true, icon: Target },
-  { label: "Receita do Mês", value: "R$ 87.400", change: "+18%", up: true, icon: DollarSign },
-  { label: "Leads Recebidos", value: "1.432", change: "+8%", up: true, icon: Users },
-  { label: "Tempo Médio Resp.", value: "4m 32s", change: "-18%", up: true, icon: Clock },
+  { label: "Taxa de Conversão", value: "14,4%",      change: "+2,8%", up: true, icon: Target },
+  { label: "Receita do Mês",   value: "R$ 43.480", change: "+18%",  up: true, icon: DollarSign },
+  { label: "Atendimentos",     value: "643",        change: "+11%",  up: true, icon: Users },
+  { label: "Tempo Médio Resp.",value: "3m 12s",     change: "-24%",  up: true, icon: Clock },
 ];
 
 const periods = ["Hoje", "7 dias", "30 dias", "Este mês", "Personalizado"];
@@ -196,8 +195,8 @@ export default function AnalyticsPage() {
                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
                 <Bar dataKey="whatsapp" name="WhatsApp" fill="#25D366" radius={[3, 3, 0, 0]} />
                 <Bar dataKey="instagram" name="Instagram" fill="#E1306C" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="email" name="Email" fill="#6C3BFF" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="outros" name="Outros" fill="#d1d5db" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="email" name="TikTok" fill="#111827" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="outros" name="Indicação" fill="#6C3BFF" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

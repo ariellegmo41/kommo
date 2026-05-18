@@ -13,17 +13,17 @@ import {
 import { cn } from "@/lib/utils";
 
 const campaigns = [
-  { id: "1", name: "Black Friday — Oferta Especial", status: "Ativa", channel: "WhatsApp", sent: 2340, delivered: 2298, opened: 1840, clicked: 420, date: "18/05/2026" },
-  { id: "2", name: "Reativação de Leads Frios", status: "Agendada", channel: "WhatsApp", sent: 0, delivered: 0, opened: 0, clicked: 0, date: "20/05/2026" },
-  { id: "3", name: "Newsletter Semanal", status: "Concluída", channel: "Email", sent: 1200, delivered: 1189, opened: 876, clicked: 234, date: "11/05/2026" },
-  { id: "4", name: "Promoção Instagram", status: "Rascunho", channel: "Instagram", sent: 0, delivered: 0, opened: 0, clicked: 0, date: "-" },
+  { id: "1", name: "Coleção Verão 2026 — Lançamento", status: "Ativa", channel: "WhatsApp", sent: 1842, delivered: 1810, opened: 1540, clicked: 387, date: "18/05/2026" },
+  { id: "2", name: "VIP Night — Clientes Especiais", status: "Agendada", channel: "WhatsApp", sent: 0, delivered: 0, opened: 0, clicked: 0, date: "22/05/2026" },
+  { id: "3", name: "Liquidação Inverno — Até 50% OFF", status: "Concluída", channel: "WhatsApp", sent: 2130, delivered: 2098, opened: 1670, clicked: 412, date: "10/05/2026" },
+  { id: "4", name: "Novas Peças — Outono Elegante", status: "Rascunho", channel: "Instagram", sent: 0, delivered: 0, opened: 0, clicked: 0, date: "-" },
 ];
 
 const perfData = [
-  { name: "Enviado", value: 2340 },
-  { name: "Entregue", value: 2298 },
-  { name: "Aberto", value: 1840 },
-  { name: "Clicado", value: 420 },
+  { name: "Enviado", value: 1842 },
+  { name: "Entregue", value: 1810 },
+  { name: "Aberto", value: 1540 },
+  { name: "Clicado", value: 387 },
 ];
 
 const statusColors: Record<string, string> = {
@@ -34,18 +34,18 @@ const statusColors: Record<string, string> = {
 };
 
 const templates = [
-  { id: "1", name: "Oferta especial", preview: "🎉 Olá {{nome}}! Temos uma oferta exclusiva para você hoje..." },
-  { id: "2", name: "Follow-up produto", preview: "Oi {{nome}}, notei que você se interessou por nosso produto..." },
-  { id: "3", name: "Reativação", preview: "{{nome}}, faz um tempo que não conversamos. Posso te ajudar?" },
-  { id: "4", name: "Confirmação", preview: "Olá {{nome}}, sua solicitação foi confirmada! ✅" },
+  { id: "1", name: "Lançamento Coleção", preview: "Oi {{nome}}! A nova Coleção Verão 2026 da Bella Modas chegou! Peças exclusivas para você arrasar..." },
+  { id: "2", name: "Follow-up produto", preview: "Oi {{nome}}, vi que você se interessou pelo {{produto}}. Ainda temos no seu tamanho!" },
+  { id: "3", name: "Reativação cliente", preview: "{{nome}}, sentimos sua falta! Temos novidades lindas esperando por você na Bella Modas 😍" },
+  { id: "4", name: "Pedido confirmado", preview: "Olá {{nome}}, seu pedido foi confirmado! Em breve chega na sua casa com muito amor 💜" },
 ];
 
 const segments = [
-  { id: "1", name: "Todos os leads", count: 1432 },
-  { id: "2", name: "Leads quentes (score ≥ 80)", count: 287 },
-  { id: "3", name: "Sem resposta há 7 dias", count: 412 },
-  { id: "4", name: "Proposta enviada", count: 228 },
-  { id: "5", name: "Clientes ativos", count: 352 },
+  { id: "1", name: "Todas as clientes",            count: 2340 },
+  { id: "2", name: "Clientes VIP (score ≥ 80)",    count: 312  },
+  { id: "3", name: "Sem compra há 30 dias",         count: 487  },
+  { id: "4", name: "Interessadas — sem fechar",     count: 194  },
+  { id: "5", name: "Seguidoras Instagram",          count: 890  },
 ];
 
 const channelOptions = [

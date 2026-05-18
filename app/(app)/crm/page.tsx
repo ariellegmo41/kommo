@@ -26,22 +26,22 @@ interface Stage {
 
 const initialStages: Stage[] = [
   {
-    id: "novo",
-    label: "Novo Lead",
+    id: "interesse",
+    label: "Novo Interesse",
     color: "bg-gray-400",
     leads: [
-      { id: "1", name: "Maria Fernanda", company: "Tech Startup", value: "R$ 2.400", channel: "WhatsApp", score: 87, avatar: "M", tags: ["VIP"], days: 1 },
-      { id: "2", name: "João Paulo", value: "R$ 1.200", channel: "Instagram", score: 65, avatar: "J", tags: ["Novo"], days: 0 },
-      { id: "3", name: "Loja Bella", company: "Bella Modas", value: "R$ 5.800", channel: "Messenger", score: 72, avatar: "L", tags: ["B2B"], days: 2 },
+      { id: "1", name: "Fernanda Lima", value: "R$ 459", channel: "WhatsApp", score: 82, avatar: "F", tags: ["VIP"], days: 0 },
+      { id: "2", name: "Priscila Tavares", value: "R$ 289", channel: "TikTok", score: 61, avatar: "P", tags: ["Novo"], days: 1 },
+      { id: "3", name: "Camila Rodrigues", value: "R$ 348", channel: "Instagram", score: 74, avatar: "C", tags: ["Instagram"], days: 1 },
     ],
   },
   {
-    id: "qualificando",
-    label: "Qualificando",
+    id: "consultoria",
+    label: "Consultoria de Estilo",
     color: "bg-[#7B61FF]",
     leads: [
-      { id: "4", name: "Ana Costa", company: "Ana Imóveis", value: "R$ 8.000", channel: "WhatsApp", score: 91, avatar: "A", tags: ["Quente"], days: 3 },
-      { id: "5", name: "Carlos Alves", value: "R$ 3.600", channel: "Telegram", score: 60, avatar: "C", tags: ["SDR"], days: 5 },
+      { id: "4", name: "Rafaela Santos", value: "R$ 890", channel: "Instagram", score: 91, avatar: "R", tags: ["Consultoria"], days: 2 },
+      { id: "5", name: "Bianca Figueiredo", value: "R$ 560", channel: "WhatsApp", score: 78, avatar: "B", tags: ["Quente"], days: 3 },
     ],
   },
   {
@@ -49,25 +49,25 @@ const initialStages: Stage[] = [
     label: "Proposta Enviada",
     color: "bg-[#6C3BFF]",
     leads: [
-      { id: "6", name: "Empresa XYZ", company: "XYZ Ltda", value: "R$ 14.400", channel: "Email", score: 95, avatar: "E", tags: ["B2B", "VIP"], days: 7 },
-      { id: "7", name: "Patricia Sousa", value: "R$ 2.800", channel: "WhatsApp", score: 78, avatar: "P", tags: ["Proposta"], days: 4 },
+      { id: "6", name: "Tatiane Oliveira", value: "R$ 720", channel: "WhatsApp", score: 88, avatar: "T", tags: ["Look Festa"], days: 2 },
+      { id: "7", name: "Larissa Mendes", value: "R$ 459", channel: "WhatsApp", score: 75, avatar: "L", tags: ["Troca"], days: 4 },
     ],
   },
   {
-    id: "negociacao",
-    label: "Negociação",
-    color: "bg-blue-500",
+    id: "pagamento",
+    label: "Aguardando Pagamento",
+    color: "bg-amber-500",
     leads: [
-      { id: "8", name: "Diego Santos", company: "DS Group", value: "R$ 21.600", channel: "WhatsApp", score: 88, avatar: "D", tags: ["Lead Quente", "B2B"], days: 10 },
+      { id: "8", name: "Andressa Costa", value: "R$ 1.280", channel: "WhatsApp", score: 93, avatar: "A", tags: ["VIP", "Recorrente"], days: 1 },
     ],
   },
   {
-    id: "fechado",
-    label: "Fechado ✓",
+    id: "confirmado",
+    label: "Pedido Confirmado ✓",
     color: "bg-[#10B981]",
     leads: [
-      { id: "9", name: "Fernanda Costa", company: "Costa & Filhos", value: "R$ 4.200", channel: "Instagram", score: 99, avatar: "F", tags: ["VIP"], days: 14 },
-      { id: "10", name: "Bruno Lima", value: "R$ 7.800", channel: "WhatsApp", score: 97, avatar: "B", tags: ["Recorrente"], days: 20 },
+      { id: "9", name: "Marina Duarte", value: "R$ 648", channel: "Instagram", score: 99, avatar: "M", tags: ["VIP"], days: 5 },
+      { id: "10", name: "Juliana Freitas", value: "R$ 459", channel: "WhatsApp", score: 97, avatar: "J", tags: ["Recorrente"], days: 7 },
     ],
   },
 ];

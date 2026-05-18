@@ -14,17 +14,17 @@ const tabs = [
 ];
 
 const team = [
-  { name: "Carla Mendes", email: "carla@empresa.com", role: "Admin", status: "Ativo", avatar: "C" },
-  { name: "Bruno Lima", email: "bruno@empresa.com", role: "Closer", status: "Ativo", avatar: "B" },
-  { name: "Ana Paula", email: "ana@empresa.com", role: "SDR", status: "Ativo", avatar: "A" },
-  { name: "Diego Santos", email: "diego@empresa.com", role: "Atendimento", status: "Inativo", avatar: "D" },
+  { name: "Carla Mendes",  email: "carla@bellamodas.com.br",   role: "Admin",       status: "Ativo",  avatar: "C" },
+  { name: "Ana Beatriz",   email: "ana@bellamodas.com.br",     role: "Closer",      status: "Ativo",  avatar: "A" },
+  { name: "Juliana Costa", email: "juliana@bellamodas.com.br", role: "SDR",         status: "Ativo",  avatar: "J" },
+  { name: "Beatriz Lima",  email: "bia@bellamodas.com.br",     role: "Atendimento", status: "Ativo",  avatar: "B" },
 ];
 
 const avColors: Record<string, string> = {
   C: "bg-[#6C3BFF]",
-  B: "bg-[#10B981]",
   A: "bg-amber-500",
-  D: "bg-blue-500",
+  J: "bg-[#10B981]",
+  B: "bg-rose-500",
 };
 
 export default function ConfiguracoesPage() {
@@ -59,19 +59,19 @@ export default function ConfiguracoesPage() {
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-[#6C3BFF] to-[#7B61FF] rounded-xl flex items-center justify-center text-white text-2xl font-bold">
-                    M
+                    B
                   </div>
                   <div>
-                    <p className="font-semibold text-[#111827]">Minha Empresa</p>
+                    <p className="font-semibold text-[#111827]">Bella Modas</p>
                     <button className="text-xs text-[#6C3BFF] hover:underline">Alterar logo</button>
                   </div>
                 </div>
                 {[
-                  { label: "Nome da Empresa", value: "Minha Empresa" },
-                  { label: "CNPJ", value: "00.000.000/0001-00" },
-                  { label: "Email", value: "contato@empresa.com" },
-                  { label: "Telefone", value: "+55 11 3000-0000" },
-                  { label: "Site", value: "www.empresa.com" },
+                  { label: "Nome da Empresa", value: "Bella Modas" },
+                  { label: "CNPJ", value: "12.345.678/0001-99" },
+                  { label: "Email", value: "contato@bellamodas.com.br" },
+                  { label: "Telefone", value: "+55 11 99400-7820" },
+                  { label: "Site", value: "www.bellamodas.com.br" },
                 ].map((f) => (
                   <div key={f.label}>
                     <label className="text-xs font-medium text-gray-500 block mb-1">{f.label}</label>

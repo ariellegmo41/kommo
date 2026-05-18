@@ -78,8 +78,8 @@ export default function Sidebar() {
       {/* Workspace */}
       <div className="px-3 py-3 border-b border-white/10">
         <button className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group">
-          <div className="w-6 h-6 rounded bg-[#6C3BFF] flex items-center justify-center text-white text-[10px] font-bold">M</div>
-          <span className="text-white/70 text-xs flex-1 text-left truncate">Minha Empresa</span>
+          <div className="w-6 h-6 rounded bg-[#6C3BFF] flex items-center justify-center text-white text-[10px] font-bold">B</div>
+          <span className="text-white/70 text-xs flex-1 text-left truncate">Bella Modas</span>
           <ChevronDown size={12} className="text-white/40 group-hover:text-white/60 flex-shrink-0" />
         </button>
       </div>
@@ -105,8 +105,8 @@ export default function Sidebar() {
         <div className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#6C3BFF] to-[#7B61FF] flex items-center justify-center text-white text-xs font-bold">A</div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-xs font-medium truncate">Admin</p>
-            <p className="text-white/40 text-[10px] truncate">admin@empresa.com</p>
+            <p className="text-white text-xs font-medium truncate">Carla Mendes</p>
+            <p className="text-white/40 text-[10px] truncate">carla@bellamodas.com.br</p>
           </div>
           <button className="text-white/40 hover:text-white/70 transition-colors"><LogOut size={14} /></button>
         </div>

@@ -7,20 +7,20 @@ const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const hours = Array.from({ length: 12 }, (_, i) => `${i + 8}:00`);
 
 const events = [
-  { day: 1, hour: 9, label: "Demo — Cliente ABC", color: "bg-[#6C3BFF]", duration: 1 },
-  { day: 2, hour: 11, label: "Reunião de Pipeline", color: "bg-[#10B981]", duration: 1 },
-  { day: 3, hour: 14, label: "Follow-up XYZ Ltda", color: "bg-amber-500", duration: 1 },
-  { day: 3, hour: 16, label: "Review Semanal", color: "bg-blue-500", duration: 1 },
-  { day: 4, hour: 9, label: "Onboarding — Fernanda", color: "bg-rose-500", duration: 2 },
-  { day: 5, hour: 10, label: "Call Proposta — Diego", color: "bg-[#7B61FF]", duration: 1 },
+  { day: 1, hour: 9,  label: "Live de moda — Instagram", color: "bg-[#6C3BFF]", duration: 2 },
+  { day: 2, hour: 11, label: "Recebimento nova coleção",  color: "bg-[#10B981]", duration: 1 },
+  { day: 3, hour: 14, label: "Atendimento VIP — Fernanda Lima", color: "bg-amber-500", duration: 1 },
+  { day: 3, hour: 16, label: "Sessão de fotos — Outono", color: "bg-blue-500", duration: 2 },
+  { day: 4, hour: 9,  label: "Reunião c/ fornecedora",   color: "bg-rose-500", duration: 1 },
+  { day: 5, hour: 10, label: "Lançamento Coleção Verão",  color: "bg-[#7B61FF]", duration: 1 },
 ];
 
 const tasks = [
-  { label: "Enviar proposta para Empresa XYZ", done: false, priority: "Alta", due: "Hoje 17:00" },
-  { label: "Follow-up com Carlos Alves", done: false, priority: "Média", due: "Hoje 15:00" },
-  { label: "Atualizar pipeline semanal", done: true, priority: "Baixa", due: "Ontem" },
-  { label: "Demo com potencial cliente", done: false, priority: "Alta", due: "Amanhã 9:00" },
-  { label: "Review do Salesbot configuração", done: false, priority: "Média", due: "Sex 16:00" },
+  { label: "Enviar proposta look para Rafaela Santos", done: false, priority: "Alta", due: "Hoje 17:00" },
+  { label: "Confirmar atendimento VIP — Fernanda Lima", done: false, priority: "Alta", due: "Hoje 13:00" },
+  { label: "Fotografar novas peças Outono",             done: true,  priority: "Baixa", due: "Ontem" },
+  { label: "Publicar Reels — Coleção Verão 2026",       done: false, priority: "Alta", due: "Amanhã 9:00" },
+  { label: "Revisar tabela de tamanhos no Salesbot",    done: false, priority: "Média", due: "Sex 16:00" },
 ];
 
 const priorityColors: Record<string, string> = {

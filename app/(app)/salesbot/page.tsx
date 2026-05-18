@@ -6,19 +6,19 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const bots = [
-  { id: "1", name: "Bot de Boas-vindas", active: true, conversations: 1432, responses: 98, channel: "WhatsApp" },
-  { id: "2", name: "Qualificador de Leads", active: true, conversations: 654, responses: 94, channel: "Todos" },
-  { id: "3", name: "Bot de Agendamento", active: false, conversations: 89, responses: 91, channel: "WhatsApp" },
-  { id: "4", name: "Suporte Pós-venda", active: true, conversations: 287, responses: 96, channel: "WhatsApp" },
+  { id: "1", name: "Boas-vindas Bella Modas",    active: true,  conversations: 1842, responses: 98, channel: "WhatsApp + Instagram" },
+  { id: "2", name: "Guia de Tamanhos & Medidas", active: true,  conversations: 743,  responses: 96, channel: "WhatsApp" },
+  { id: "3", name: "Assistente de Moda",         active: true,  conversations: 391,  responses: 93, channel: "Instagram + TikTok" },
+  { id: "4", name: "Trocas & Devoluções",        active: false, conversations: 128,  responses: 91, channel: "WhatsApp" },
 ];
 
 const flowSteps = [
-  { label: "Início", type: "trigger", color: "bg-blue-500" },
-  { label: "Mensagem de boas-vindas", type: "message", color: "bg-[#6C3BFF]" },
-  { label: "Pergunta: Qual serviço?", type: "question", color: "bg-amber-500" },
-  { label: "Condição: Tipo", type: "condition", color: "bg-rose-500" },
-  { label: "Enviar informações", type: "message", color: "bg-[#6C3BFF]" },
-  { label: "Transferir para humano", type: "handoff", color: "bg-[#10B981]" },
+  { label: "Nova mensagem recebida", type: "trigger", color: "bg-blue-500" },
+  { label: "Olá! Seja bem-vinda à Bella Modas 💜", type: "message", color: "bg-[#6C3BFF]" },
+  { label: "Pergunta: O que você procura?", type: "question", color: "bg-amber-500" },
+  { label: "Condição: Tamanho / Produto / Troca", type: "condition", color: "bg-rose-500" },
+  { label: "Enviar catálogo e tabela de medidas", type: "message", color: "bg-[#6C3BFF]" },
+  { label: "Transferir para consultora de estilo", type: "handoff", color: "bg-[#10B981]" },
 ];
 
 export default function SalesbotPage() {
@@ -64,7 +64,7 @@ export default function SalesbotPage() {
 
           {/* Flow preview */}
           <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <h3 className="font-semibold text-[#111827] mb-4">Fluxo — Bot de Boas-vindas</h3>
+            <h3 className="font-semibold text-[#111827] mb-4">Fluxo — Boas-vindas Bella Modas</h3>
             <div className="space-y-2">
               {flowSteps.map((step, i) => (
                 <div key={i} className="flex items-center gap-3">

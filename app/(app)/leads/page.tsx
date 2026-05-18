@@ -6,33 +6,36 @@ import { Search, Filter, MessageSquare, Phone, MoreHorizontal, Flame, ArrowUpDow
 import { cn } from "@/lib/utils";
 
 const leads = [
-  { id: 1, name: "Maria Fernanda", company: "Tech Startup", email: "maria@tech.com", phone: "+55 11 99999-0001", channel: "WhatsApp", stage: "Qualificando", score: 87, value: "R$ 2.400", tags: ["VIP", "Quente"], created: "Hoje" },
-  { id: 2, name: "João Paulo", company: "-", email: "joao@email.com", phone: "+55 11 99999-0002", channel: "Instagram", stage: "Novo Lead", score: 65, value: "R$ 1.200", tags: ["Novo"], created: "Hoje" },
-  { id: 3, name: "Ana Costa", company: "Ana Imóveis", email: "ana@imoveis.com", phone: "+55 11 99999-0003", channel: "WhatsApp", stage: "Proposta", score: 91, value: "R$ 8.000", tags: ["Quente", "B2B"], created: "Ontem" },
-  { id: 4, name: "Carlos Alves", company: "-", email: "carlos@email.com", phone: "+55 11 99999-0004", channel: "Telegram", stage: "Negociação", score: 60, value: "R$ 3.600", tags: ["Negociação"], created: "Ontem" },
-  { id: 5, name: "Empresa XYZ Ltda", company: "XYZ Ltda", email: "contato@xyz.com", phone: "+55 11 99999-0005", channel: "Email", stage: "Proposta", score: 95, value: "R$ 14.400", tags: ["B2B", "VIP"], created: "2 dias" },
-  { id: 6, name: "Patricia Sousa", company: "-", email: "patricia@email.com", phone: "+55 11 99999-0006", channel: "WhatsApp", stage: "Novo Lead", score: 78, value: "R$ 2.800", tags: ["Interessado"], created: "3 dias" },
-  { id: 7, name: "Diego Santos", company: "DS Group", email: "diego@dsgroup.com", phone: "+55 11 99999-0007", channel: "WhatsApp", stage: "Negociação", score: 88, value: "R$ 21.600", tags: ["Lead Quente", "B2B"], created: "5 dias" },
-  { id: 8, name: "Fernanda Costa", company: "Costa & Filhos", email: "fernanda@costa.com", phone: "+55 11 99999-0008", channel: "Instagram", stage: "Fechado", score: 99, value: "R$ 4.200", tags: ["VIP"], created: "1 semana" },
+  { id: 1, name: "Fernanda Lima",     company: "-",         email: "fernanda@email.com",  phone: "+55 11 99400-0001", channel: "WhatsApp",  stage: "Consultoria de Estilo", score: 91, value: "R$ 459",   tags: ["VIP", "Quente"],    created: "Hoje"     },
+  { id: 2, name: "Camila Rodrigues",  company: "-",         email: "camila@email.com",    phone: "+55 11 99400-0002", channel: "Instagram", stage: "Novo Interesse",        score: 74, value: "R$ 348",   tags: ["Instagram"],        created: "Hoje"     },
+  { id: 3, name: "Rafaela Santos",    company: "-",         email: "rafaela@email.com",   phone: "+55 11 99400-0003", channel: "Instagram", stage: "Proposta Enviada",      score: 88, value: "R$ 890",   tags: ["Consultoria", "VIP"],created: "Ontem"    },
+  { id: 4, name: "Larissa Mendes",    company: "-",         email: "larissa@email.com",   phone: "+55 11 99400-0004", channel: "WhatsApp",  stage: "Proposta Enviada",      score: 75, value: "R$ 459",   tags: ["Troca"],            created: "Ontem"    },
+  { id: 5, name: "Andressa Costa",    company: "-",         email: "andressa@email.com",  phone: "+55 11 99400-0005", channel: "WhatsApp",  stage: "Aguardando Pagamento",  score: 93, value: "R$ 1.280", tags: ["VIP", "Recorrente"],created: "2 dias"   },
+  { id: 6, name: "Priscila Tavares",  company: "-",         email: "priscila@email.com",  phone: "+55 11 99400-0006", channel: "TikTok",    stage: "Novo Interesse",        score: 61, value: "R$ 289",   tags: ["Novo", "TikTok"],   created: "2 dias"   },
+  { id: 7, name: "Bianca Figueiredo", company: "-",         email: "bianca@email.com",    phone: "+55 11 99400-0007", channel: "WhatsApp",  stage: "Consultoria de Estilo", score: 78, value: "R$ 560",   tags: ["Quente"],           created: "3 dias"   },
+  { id: 8, name: "Marina Duarte",     company: "-",         email: "marina@email.com",    phone: "+55 11 99400-0008", channel: "Instagram", stage: "Pedido Confirmado",     score: 99, value: "R$ 648",   tags: ["VIP"],              created: "5 dias"   },
+  { id: 9, name: "Juliana Freitas",   company: "-",         email: "juliana@email.com",   phone: "+55 11 99400-0009", channel: "WhatsApp",  stage: "Pedido Confirmado",     score: 97, value: "R$ 459",   tags: ["Recorrente"],       created: "1 semana" },
+  { id:10, name: "Tatiane Oliveira",  company: "-",         email: "tatiane@email.com",   phone: "+55 11 99400-0010", channel: "WhatsApp",  stage: "Proposta Enviada",      score: 82, value: "R$ 720",   tags: ["Look Festa"],       created: "1 semana" },
 ];
 
 const stageColors: Record<string, string> = {
-  "Novo Lead": "bg-gray-100 text-gray-600",
-  "Qualificando": "bg-purple-100 text-purple-700",
-  "Proposta": "bg-blue-100 text-blue-700",
-  "Negociação": "bg-amber-100 text-amber-700",
-  "Fechado": "bg-green-100 text-green-700",
+  "Novo Interesse": "bg-gray-100 text-gray-600",
+  "Consultoria de Estilo": "bg-purple-100 text-purple-700",
+  "Proposta Enviada": "bg-blue-100 text-blue-700",
+  "Aguardando Pagamento": "bg-amber-100 text-amber-700",
+  "Pedido Confirmado": "bg-green-100 text-green-700",
 };
 
 const tagColors: Record<string, string> = {
   VIP: "bg-amber-100 text-amber-700",
-  Novo: "bg-green-100 text-green-700",
   Quente: "bg-rose-100 text-rose-700",
-  B2B: "bg-gray-100 text-gray-700",
-  Proposta: "bg-orange-100 text-orange-700",
-  "Lead Quente": "bg-rose-100 text-rose-700",
-  Negociação: "bg-purple-100 text-purple-700",
-  Interessado: "bg-blue-100 text-blue-700",
+  Novo: "bg-green-100 text-green-700",
+  Instagram: "bg-pink-100 text-pink-700",
+  TikTok: "bg-gray-100 text-gray-700",
+  Consultoria: "bg-[#6C3BFF]/10 text-[#6C3BFF]",
+  Troca: "bg-orange-100 text-orange-700",
+  Recorrente: "bg-teal-100 text-teal-700",
+  "Look Festa": "bg-rose-100 text-rose-700",
 };
 
 export default function LeadsPage() {
@@ -48,7 +51,7 @@ export default function LeadsPage() {
     <div className="flex flex-col h-full overflow-hidden">
       <Topbar
         title="Leads"
-        subtitle={`${leads.length} leads no total`}
+        subtitle={`${leads.length} clientes no pipeline · Bella Modas`}
         action={{ label: "Novo Lead", onClick: () => {} }}
       />
 
