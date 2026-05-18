@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, MessageSquare, Users, Kanban, GitBranch, Megaphone,
   Bot, Sparkles, BarChart3, Calendar, Plug, Settings, LogOut, ChevronDown,
-  Store, Code2, Palette, Crown,
+  Store, Code2, Palette, Crown, ShoppingBag, ShoppingCart, Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,12 @@ const phase3Nav = [
   { href: "/white-label", label: "White-label", icon: Palette },
   { href: "/marketplace", label: "Marketplace", icon: Store },
   { href: "/api",         label: "API Pública",  icon: Code2 },
+];
+
+const ecommerceNav = [
+  { href: "/catalogo", label: "Catálogo",  icon: ShoppingBag },
+  { href: "/pedidos",  label: "Pedidos",   icon: ShoppingCart },
+  { href: "/estoque",  label: "Estoque",   icon: Package },
 ];
 
 const bottomNav = [
@@ -95,6 +101,15 @@ export default function Sidebar() {
             <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Avançado</span>
           </div>
           {phase3Nav.map((item) => <NavItem key={item.href} {...item} />)}
+        </div>
+
+        {/* E-commerce section */}
+        <div className="pt-3 pb-1">
+          <div className="flex items-center gap-1.5 px-3 mb-1.5">
+            <ShoppingBag size={10} className="text-[#10B981]" />
+            <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">E-Commerce</span>
+          </div>
+          {ecommerceNav.map((item) => <NavItem key={item.href} {...item} />)}
         </div>
 
         {bottomNav.map((item) => <NavItem key={item.href} {...item} />)}
