@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, MessageSquare, Users, Kanban, GitBranch, Megaphone,
   Bot, Sparkles, BarChart3, Calendar, Plug, Settings, LogOut, ChevronDown,
-  Store, Code2, Palette, Crown, ShoppingBag, ShoppingCart, Package,
+  Store, Code2, Palette, Crown, Video, Radio, Tag, ClipboardList, Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,10 +29,12 @@ const phase3Nav = [
   { href: "/api",         label: "API Pública",  icon: Code2 },
 ];
 
-const ecommerceNav = [
-  { href: "/catalogo", label: "Catálogo",  icon: ShoppingBag },
-  { href: "/pedidos",  label: "Pedidos",   icon: ShoppingCart },
-  { href: "/estoque",  label: "Estoque",   icon: Package },
+const superliveNav = [
+  { href: "/lives",    label: "Lives",     icon: Video,         liveNow: false },
+  { href: "/ao-vivo",  label: "Ao Vivo",   icon: Radio,         liveNow: true  },
+  { href: "/produtos", label: "Produtos",  icon: Tag,           liveNow: false },
+  { href: "/pedidos",  label: "Pedidos",   icon: ClipboardList, liveNow: false },
+  { href: "/estoque",  label: "Estoque",   icon: Package,       liveNow: false },
 ];
 
 const bottomNav = [
@@ -42,8 +44,8 @@ const bottomNav = [
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const NavItem = ({ href, label, icon: Icon, badge }: {
-    href: string; label: string; icon: typeof LayoutDashboard; badge?: number;
+  const NavItem = ({ href, label, icon: Icon, badge, liveNow }: {
+    href: string; label: string; icon: typeof LayoutDashboard; badge?: number; liveNow?: boolean;
   }) => {
     const active = pathname === href || pathname.startsWith(href + "/");
     return (
@@ -62,6 +64,9 @@ export default function Sidebar() {
             active ? "bg-white/20 text-white" : "bg-[#6C3BFF] text-white"
           )}>{badge}</span>
         )}
+        {liveNow && !badge && (
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+        )}
       </Link>
     );
   };
@@ -75,8 +80,8 @@ export default function Sidebar() {
             <Sparkles size={16} className="text-white" />
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-none">IDEA Atende</p>
-            <p className="text-white/40 text-[10px] mt-0.5">CRM Conversacional</p>
+            <p className="text-white font-bold text-sm leading-none">Superlive</p>
+            <p className="text-white/40 text-[10px] mt-0.5">Plataforma de Lives</p>
           </div>
         </div>
       </div>
@@ -103,13 +108,13 @@ export default function Sidebar() {
           {phase3Nav.map((item) => <NavItem key={item.href} {...item} />)}
         </div>
 
-        {/* E-commerce section */}
+        {/* Superlive section */}
         <div className="pt-3 pb-1">
           <div className="flex items-center gap-1.5 px-3 mb-1.5">
-            <ShoppingBag size={10} className="text-[#10B981]" />
-            <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">E-Commerce</span>
+            <Video size={10} className="text-red-400" />
+            <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Superlive</span>
           </div>
-          {ecommerceNav.map((item) => <NavItem key={item.href} {...item} />)}
+          {superliveNav.map((item) => <NavItem key={item.href} {...item} />)}
         </div>
 
         {bottomNav.map((item) => <NavItem key={item.href} {...item} />)}

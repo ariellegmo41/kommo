@@ -35,7 +35,7 @@ const kpis = [
 const alerts = [
   { icon: Package,       label: "2 itens sem estoque",             href: "/estoque",  chip: "bg-red-50 border-red-200 text-red-700"       },
   { icon: MessageSquare, label: "4 leads sem resposta há +24h",    href: "/inbox",    chip: "bg-amber-50 border-amber-200 text-amber-700"  },
-  { icon: ShoppingBag,   label: "1 pedido aguardando confirmação", href: "/pedidos",  chip: "bg-blue-50 border-blue-200 text-blue-700"    },
+  { icon: ShoppingBag,   label: "Live ao vivo agora — 156 vendo",  href: "/ao-vivo",  chip: "bg-rose-50 border-rose-200 text-rose-700"    },
 ];
 
 const missionInit = [
@@ -48,7 +48,7 @@ const missionInit = [
 const quickActions = [
   { icon: MessageSquare, label: "Atendimento", href: "/inbox",     color: "bg-[#6C3BFF]/10 text-[#6C3BFF] hover:bg-[#6C3BFF]/20" },
   { icon: UserPlus,      label: "Nova Lead",   href: "/leads",     color: "bg-[#10B981]/10 text-[#10B981] hover:bg-[#10B981]/20" },
-  { icon: ShoppingBag,   label: "Pedidos",     href: "/pedidos",   color: "bg-amber-100 text-amber-600 hover:bg-amber-200"       },
+  { icon: ShoppingBag,   label: "Lives",       href: "/lives",     color: "bg-rose-100 text-rose-600 hover:bg-rose-200"          },
   { icon: Package,       label: "Estoque",     href: "/estoque",   color: "bg-red-100 text-red-500 hover:bg-red-200"             },
   { icon: BarChart3,     label: "Analytics",   href: "/analytics", color: "bg-blue-100 text-blue-600 hover:bg-blue-200"          },
   { icon: Calendar,      label: "Agenda",      href: "/calendario",color: "bg-purple-100 text-purple-600 hover:bg-purple-200"    },
@@ -98,7 +98,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <Topbar title="Dashboard" subtitle="Bella Modas · visão geral em tempo real" />
+      <Topbar title="Dashboard" subtitle="Bella Modas · Superlive — visão geral em tempo real" />
 
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
 
