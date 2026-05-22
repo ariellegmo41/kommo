@@ -18,7 +18,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import {
   Zap, MessageSquare, User, GitBranch, Clock, Globe,
-  Bot, Plus, Play, Pause, Pencil, Trash2, ChevronRight, X,
+  Bot, Plus, Play, Pause, Pencil, Trash2, ChevronRight, X, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -149,6 +149,9 @@ export default function FunisPage() {
   const [list, setList] = useState(automations);
   const [selected, setSelected] = useState(automations[0].id);
   const [view, setView] = useState<"canvas" | "list">("canvas");
+  const [saved, setSaved] = useState(false);
+  const [showNewAuto, setShowNewAuto] = useState(false);
+  const [newAutoName, setNewAutoName] = useState("");
 
   const onConnect = useCallback((params: Connection) => {
     setEdges((eds) => addEdge({ ...params, style: { stroke: "#6C3BFF", strokeWidth: 2 } }, eds));
@@ -158,13 +161,46 @@ export default function FunisPage() {
     setList((prev) => prev.map((a) => a.id === id ? { ...a, active: !a.active } : a));
   }
 
+  function saveFlow() {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  function addAutomation() {
+    if (!newAutoName.trim()) return;
+    const newAuto = { id: String(Date.now()), name: newAutoName, trigger: "Nova mensagem", active: false, runs: 0 };
+    setList((prev) => [...prev, newAuto]);
+    setSelected(newAuto.id);
+    setNewAutoName("");
+    setShowNewAuto(false);
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <Topbar
         title="Automações"
         subtitle="Builder visual no-code"
-        action={{ label: "Nova Automação", onClick: () => {} }}
+        action={{ label: "Nova Automação", onClick: () => setShowNewAuto(true) }}
       />
+
+      {showNewAuto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowNewAuto(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-[360px] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-[#111827]">Nova Automação</h3>
+              <button onClick={() => setShowNewAuto(false)}><X size={16} className="text-gray-400" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Nome</label>
+                <input value={newAutoName} onChange={(e) => setNewAutoName(e.target.value)} placeholder="Ex: Follow-up após 48h" className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+              </div>
+              <button onClick={addAutomation} className="w-full py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">Criar Automação</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-hidden flex">
         {/* Left panel */}
@@ -195,7 +231,7 @@ export default function FunisPage() {
                     <span className="text-[10px] text-gray-400">{a.runs.toLocaleString("pt-BR")} execuções</span>
                   </button>
                 ))}
-                <button className="w-full flex items-center justify-center gap-1.5 py-2 mt-2 text-gray-400 hover:text-[#6C3BFF] hover:bg-[#6C3BFF]/5 rounded-lg border-2 border-dashed border-gray-200 hover:border-[#6C3BFF]/30 transition-all text-xs">
+                <button onClick={() => setShowNewAuto(true)} className="w-full flex items-center justify-center gap-1.5 py-2 mt-2 text-gray-400 hover:text-[#6C3BFF] hover:bg-[#6C3BFF]/5 rounded-lg border-2 border-dashed border-gray-200 hover:border-[#6C3BFF]/30 transition-all text-xs">
                   <Plus size={12} /> Nova automação
                 </button>
               </div>
@@ -262,7 +298,7 @@ export default function FunisPage() {
             <span className="text-xs text-gray-500">Boas-vindas automático</span>
             <div className="w-px h-4 bg-gray-200" />
             <button className="text-xs text-gray-500 hover:text-[#6C3BFF] flex items-center gap-1 transition-colors"><Play size={12} /> Testar</button>
-            <button className="text-xs px-3 py-1 bg-[#6C3BFF] text-white rounded-lg hover:bg-[#5930e8] transition-colors">Salvar</button>
+            <button onClick={saveFlow} className={cn("text-xs px-3 py-1 rounded-lg transition-colors", saved ? "bg-[#10B981] text-white" : "bg-[#6C3BFF] text-white hover:bg-[#5930e8]")}>{saved ? "✓ Salvo!" : "Salvar"}</button>
           </div>
         </div>
       </div>

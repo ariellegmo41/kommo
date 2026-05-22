@@ -56,7 +56,7 @@ const channelOptions = [
 
 const steps = ["Canal", "Audiência", "Mensagem", "Agendamento", "Revisão"];
 
-function WizardModal({ onClose }: { onClose: () => void }) {
+function WizardModal({ onClose }: { onClose: (campaign?: typeof campaigns[0]) => void }) {
   const [step, setStep] = useState(0);
   const [channel, setChannel] = useState("");
   const [segment, setSegment] = useState("");
@@ -70,7 +70,7 @@ function WizardModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={() => onClose(undefined)} />
       <div className="relative bg-white rounded-2xl shadow-2xl w-[620px] max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -78,7 +78,7 @@ function WizardModal({ onClose }: { onClose: () => void }) {
             <h2 className="font-semibold text-[#111827]">Nova Campanha</h2>
             <p className="text-xs text-gray-400 mt-0.5">Passo {step + 1} de {steps.length}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={() => onClose(undefined)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X size={16} className="text-gray-400" />
           </button>
         </div>
@@ -217,10 +217,28 @@ function WizardModal({ onClose }: { onClose: () => void }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-          <button onClick={() => step > 0 ? setStep(s => s - 1) : onClose()} className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={() => step > 0 ? setStep(s => s - 1) : onClose(undefined)} className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
             <ChevronLeft size={14} /> {step === 0 ? "Cancelar" : "Voltar"}
           </button>
-          <button onClick={() => step < steps.length - 1 ? setStep(s => s + 1) : onClose()} className="flex items-center gap-1.5 px-5 py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">
+          <button
+            onClick={() => {
+              if (step < steps.length - 1) {
+                setStep(s => s + 1);
+              } else {
+                const newC = {
+                  id: String(Date.now()), name, status: scheduleType === "now" ? "Ativa" : "Agendada",
+                  channel: channel === "whatsapp" ? "WhatsApp" : channel === "email" ? "Email" : "Instagram",
+                  sent: scheduleType === "now" ? (selectedSegment?.count ?? 0) : 0,
+                  delivered: scheduleType === "now" ? Math.round((selectedSegment?.count ?? 0) * 0.98) : 0,
+                  opened: scheduleType === "now" ? Math.round((selectedSegment?.count ?? 0) * 0.75) : 0,
+                  clicked: scheduleType === "now" ? Math.round((selectedSegment?.count ?? 0) * 0.2) : 0,
+                  date: new Date().toLocaleDateString("pt-BR"),
+                };
+                onClose(newC);
+              }
+            }}
+            className="flex items-center gap-1.5 px-5 py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors"
+          >
             {step === steps.length - 1 ? <><Send size={14} /> Disparar Campanha</> : <>Continuar <ChevronRight size={14} /></>}
           </button>
         </div>
@@ -231,6 +249,7 @@ function WizardModal({ onClose }: { onClose: () => void }) {
 
 export default function CampanhasPage() {
   const [showWizard, setShowWizard] = useState(false);
+  const [campaignList, setCampaignList] = useState(campaigns);
   const [selectedCampaign, setSelectedCampaign] = useState(campaigns[0]);
 
   return (
@@ -241,7 +260,13 @@ export default function CampanhasPage() {
         action={{ label: "Nova Campanha", onClick: () => setShowWizard(true) }}
       />
 
-      {showWizard && <WizardModal onClose={() => setShowWizard(false)} />}
+      {showWizard && <WizardModal onClose={(newCampaign) => {
+        if (newCampaign) {
+          setCampaignList((prev) => [newCampaign, ...prev]);
+          setSelectedCampaign(newCampaign);
+        }
+        setShowWizard(false);
+      }} />}
 
       <div className="flex-1 overflow-hidden flex">
         {/* List */}
@@ -274,7 +299,7 @@ export default function CampanhasPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {campaigns.map((c) => (
+                  {campaignList.map((c) => (
                     <tr
                       key={c.id}
                       onClick={() => setSelectedCampaign(c)}

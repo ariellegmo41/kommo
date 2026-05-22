@@ -4,7 +4,7 @@ import { useState } from "react";
 import Topbar from "@/components/Topbar";
 import {
   Tag, Plus, Search, Package, Star, MoreHorizontal,
-  Edit2, Copy, ShoppingBag, Filter,
+  Edit2, Copy, ShoppingBag, Filter, X, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,8 +51,33 @@ export default function ProdutosPage() {
   const [category, setCategory]   = useState("Todos");
   const [statusFilter, setStatus] = useState<ProductStatus | "todos">("todos");
   const [selected, setSelected]   = useState<Product | null>(products[0]);
+  const [productList, setProductList] = useState(products);
+  const [showNewProduct, setShowNewProduct] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState("Vestidos");
+  const [newPrice, setNewPrice] = useState("");
+  const [newCost, setNewCost] = useState("");
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
-  const filtered = products.filter((p) => {
+  function showFeedback(msg: string) {
+    setActionFeedback(msg);
+    setTimeout(() => setActionFeedback(null), 2500);
+  }
+
+  function addProduct() {
+    if (!newName.trim() || !newPrice) return;
+    const prod: Product = {
+      code: String(productList.length + 101),
+      name: newName, category: newCategory,
+      price: parseFloat(newPrice), cost: parseFloat(newCost) || 0,
+      stock: 0, sizes: { PP: 0, P: 0, M: 0, G: 0, GG: 0 },
+      status: "ativo", tags: [], color: "bg-blue-100",
+    };
+    setProductList((prev) => [...prev, prod]);
+    setNewName(""); setNewPrice(""); setNewCost(""); setShowNewProduct(false);
+  }
+
+  const filtered = productList.filter((p) => {
     const matchSearch   = search === "" || p.name.toLowerCase().includes(search.toLowerCase()) || p.code.includes(search);
     const matchCategory = category === "Todos" || p.category === category;
     const matchStatus   = statusFilter === "todos" || p.status === statusFilter;
@@ -63,10 +88,49 @@ export default function ProdutosPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+      {actionFeedback && (
+        <div className="fixed top-4 right-4 z-50 bg-[#111827] text-white px-4 py-3 rounded-xl shadow-xl text-sm font-medium flex items-center gap-2">
+          <Check size={14} className="text-[#10B981]" /> {actionFeedback}
+        </div>
+      )}
+      {showNewProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowNewProduct(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-[420px] p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-semibold text-[#111827]">Novo Produto</h3>
+              <button onClick={() => setShowNewProduct(false)}><X size={16} className="text-gray-400" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Nome *</label>
+                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do produto" className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Categoria</label>
+                <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                  {["Vestidos","Conjuntos","Blusas","Calças","Blazers","Saias"].map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Preço de venda *</label>
+                  <input type="number" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} placeholder="189.90" className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Custo</label>
+                  <input type="number" value={newCost} onChange={(e) => setNewCost(e.target.value)} placeholder="72.00" className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" />
+                </div>
+              </div>
+              <button onClick={addProduct} className="w-full py-2.5 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">Cadastrar Produto</button>
+            </div>
+          </div>
+        </div>
+      )}
       <Topbar
         title="Produtos"
         subtitle={`${products.length} produtos · ${products.filter(p => p.status !== "esgotado").length} disponíveis`}
-        action={{ label: "Novo Produto", onClick: () => {} }}
+        action={{ label: "Novo Produto", onClick: () => setShowNewProduct(true) }}
       />
 
       <div className="flex-1 overflow-hidden flex gap-0">
@@ -255,14 +319,14 @@ export default function ProdutosPage() {
 
             {/* Actions */}
             <div className="space-y-2">
-              <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#6C3BFF] text-white text-sm font-semibold hover:bg-[#5a2fd6] transition-colors">
+              <button onClick={() => showFeedback(`${selected?.name} adicionado à live!`)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#6C3BFF] text-white text-sm font-semibold hover:bg-[#5a2fd6] transition-colors">
                 <Plus size={15} /> Adicionar à Live
               </button>
               <div className="grid grid-cols-2 gap-2">
-                <button className="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:bg-gray-50 transition-colors">
+                <button onClick={() => showFeedback("Editar produto em breve")} className="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:bg-gray-50 transition-colors">
                   <Edit2 size={13} /> Editar
                 </button>
-                <button className="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:bg-gray-50 transition-colors">
+                <button onClick={() => { if (selected) { const dup = { ...selected, code: String(productList.length + 101), name: selected.name + " (cópia)" }; setProductList((p) => [...p, dup]); showFeedback("Produto duplicado!"); } }} className="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:bg-gray-50 transition-colors">
                   <Copy size={13} /> Duplicar
                 </button>
               </div>

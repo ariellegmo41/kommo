@@ -140,7 +140,7 @@ function ChecklistModal({ live, onClose }: { live: LiveEvent; onClose: () => voi
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">
             Fechar
           </button>
-          <button className="flex-1 py-2.5 rounded-xl bg-[#6C3BFF] text-white text-sm font-semibold hover:bg-[#5a2fd6] transition-colors">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-[#6C3BFF] text-white text-sm font-semibold hover:bg-[#5a2fd6] transition-colors">
             Salvar progresso
           </button>
         </div>
@@ -168,7 +168,7 @@ export default function LivesPage() {
       <Topbar
         title="Lives"
         subtitle={`${lives.filter(l => l.status !== "planejada").length} realizadas · R$ ${totalRevenue.toLocaleString("pt-BR")} faturados`}
-        action={{ label: "Criar Nova Live", onClick: () => {} }}
+        action={{ label: "Criar Nova Live", onClick: () => router.push("/calendario") }}
       />
 
       <div className="flex-1 overflow-y-auto p-5 space-y-5">

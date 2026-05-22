@@ -1,7 +1,8 @@
 "use client";
 
 import Topbar from "@/components/Topbar";
-import { ChevronLeft, ChevronRight, Clock, User, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, User, Check, Plus, X } from "lucide-react";
+import { useState } from "react";
 
 const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const hours = Array.from({ length: 12 }, (_, i) => `${i + 8}:00`);
@@ -29,10 +30,61 @@ const priorityColors: Record<string, string> = {
   Baixa: "text-green-500 bg-green-50",
 };
 
+const initTasks = tasks.map((t, i) => ({ ...t, id: i }));
+
 export default function CalendarioPage() {
+  const [taskList, setTaskList] = useState(initTasks);
+  const [view, setView] = useState<"Dia" | "Semana" | "Mês">("Semana");
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [showNewEvent, setShowNewEvent] = useState(false);
+  const [newEventLabel, setNewEventLabel] = useState("");
+  const [newEventDay, setNewEventDay] = useState("1");
+  const [newEventHour, setNewEventHour] = useState("10");
+  const [eventList, setEventList] = useState(events);
+
+  function toggleTask(id: number) {
+    setTaskList((prev) => prev.map((t) => t.id === id ? { ...t, done: !t.done } : t));
+  }
+
+  function addEvent() {
+    if (!newEventLabel.trim()) return;
+    setEventList((prev) => [...prev, { day: Number(newEventDay), hour: Number(newEventHour), label: newEventLabel, color: "bg-[#6C3BFF]", duration: 1 }]);
+    setNewEventLabel("");
+    setShowNewEvent(false);
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <Topbar title="Calendário & Tarefas" subtitle="Agenda integrada e gestão de follow-ups" action={{ label: "Novo Evento", onClick: () => {} }} />
+      <Topbar title="Calendário & Tarefas" subtitle="Agenda integrada e gestão de follow-ups" action={{ label: "Novo Evento", onClick: () => setShowNewEvent(true) }} />
+
+      {showNewEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowNewEvent(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-[380px] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-[#111827]">Novo Evento</h3>
+              <button onClick={() => setShowNewEvent(false)}><X size={16} className="text-gray-400" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Título do evento</label>
+                <input value={newEventLabel} onChange={(e) => setNewEventLabel(e.target.value)} placeholder="Ex: Reunião com cliente" className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Dia da semana (0-6)</label>
+                  <input type="number" min={0} max={6} value={newEventDay} onChange={(e) => setNewEventDay(e.target.value)} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Hora (8-19)</label>
+                  <input type="number" min={8} max={19} value={newEventHour} onChange={(e) => setNewEventHour(e.target.value)} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" />
+                </div>
+              </div>
+              <button onClick={addEvent} className="w-full py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">Adicionar Evento</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-hidden flex gap-0">
         {/* Calendar */}
@@ -40,13 +92,13 @@ export default function CalendarioPage() {
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><ChevronLeft size={16} /></button>
-              <h3 className="font-semibold text-[#111827]">Maio 2026</h3>
-              <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><ChevronRight size={16} /></button>
+              <button onClick={() => setWeekOffset((w) => w - 1)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><ChevronLeft size={16} /></button>
+              <h3 className="font-semibold text-[#111827]">Maio 2026{weekOffset !== 0 ? ` (${weekOffset > 0 ? "+" : ""}${weekOffset}sem)` : ""}</h3>
+              <button onClick={() => setWeekOffset((w) => w + 1)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><ChevronRight size={16} /></button>
             </div>
             <div className="flex gap-1">
-              {["Dia", "Semana", "Mês"].map((v, i) => (
-                <button key={v} className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${i === 1 ? "bg-[#6C3BFF] text-white" : "text-gray-500 hover:bg-gray-100"}`}>{v}</button>
+              {(["Dia", "Semana", "Mês"] as const).map((v) => (
+                <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${view === v ? "bg-[#6C3BFF] text-white" : "text-gray-500 hover:bg-gray-100"}`}>{v}</button>
               ))}
             </div>
           </div>
@@ -75,7 +127,7 @@ export default function CalendarioPage() {
                     {hours.map((_, hi) => (
                       <div key={hi} className="h-14 border-b border-gray-50" />
                     ))}
-                    {events
+                    {eventList
                       .filter((e) => e.day === di)
                       .map((ev, i) => (
                         <div
@@ -97,13 +149,13 @@ export default function CalendarioPage() {
         <div className="w-72 bg-[#F5F7FB] flex flex-col overflow-hidden">
           <div className="p-4 border-b border-gray-200 bg-white">
             <h3 className="font-semibold text-[#111827]">Tarefas</h3>
-            <p className="text-xs text-gray-400 mt-0.5">{tasks.filter((t) => !t.done).length} pendentes</p>
+            <p className="text-xs text-gray-400 mt-0.5">{taskList.filter((t) => !t.done).length} pendentes</p>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {tasks.map((task, i) => (
-              <div key={i} className="bg-white rounded-xl p-3.5 shadow-sm border border-gray-100">
+            {taskList.map((task) => (
+              <div key={task.id} className="bg-white rounded-xl p-3.5 shadow-sm border border-gray-100">
                 <div className="flex items-start gap-2.5">
-                  <button className={`w-4 h-4 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${task.done ? "bg-[#10B981] border-[#10B981]" : "border-gray-300 hover:border-[#6C3BFF]"}`}>
+                  <button onClick={() => toggleTask(task.id)} className={`w-4 h-4 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${task.done ? "bg-[#10B981] border-[#10B981]" : "border-gray-300 hover:border-[#6C3BFF]"}`}>
                     {task.done && <Check size={10} className="text-white" />}
                   </button>
                   <div className="flex-1 min-w-0">

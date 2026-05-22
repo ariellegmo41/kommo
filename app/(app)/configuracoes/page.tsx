@@ -1,7 +1,7 @@
 "use client";
 
 import Topbar from "@/components/Topbar";
-import { User, Bell, Shield, Palette, Globe, Users, CreditCard } from "lucide-react";
+import { User, Bell, Shield, Palette, Globe, Users, CreditCard, Check, X, Moon, Sun, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 const tabs = [
@@ -27,8 +27,43 @@ const avColors: Record<string, string> = {
   B: "bg-rose-500",
 };
 
+function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-[#6C3BFF]" : "bg-gray-200"}`}
+    >
+      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm ${checked ? "translate-x-4" : "translate-x-1"}`} />
+    </button>
+  );
+}
+
 export default function ConfiguracoesPage() {
   const [activeTab, setActiveTab] = useState("perfil");
+  const [saved, setSaved] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteSent, setInviteSent] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [compactMode, setCompactMode] = useState(false);
+  const [colorBlind, setColorBlind] = useState(false);
+  const [notifs, setNotifs] = useState({
+    newMessage: true, newLead: true, orderConfirmed: true,
+    liveAlert: true, dailySummary: false, weeklyReport: false,
+    whatsapp: true, email: false, browser: true,
+  });
+
+  function saveProfile() {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  }
+
+  function sendInvite() {
+    if (!inviteEmail.trim()) return;
+    setInviteSent(true);
+    setTimeout(() => { setInviteSent(false); setInviteOpen(false); setInviteEmail(""); }, 2000);
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -82,8 +117,8 @@ export default function ConfiguracoesPage() {
                     />
                   </div>
                 ))}
-                <button className="px-5 py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">
-                  Salvar Alterações
+                <button onClick={saveProfile} className={`px-5 py-2 text-white text-sm font-medium rounded-lg transition-colors ${saved ? "bg-[#10B981]" : "bg-[#6C3BFF] hover:bg-[#5930e8]"}`}>
+                  {saved ? "✓ Salvo!" : "Salvar Alterações"}
                 </button>
               </div>
             </div>
@@ -93,10 +128,36 @@ export default function ConfiguracoesPage() {
             <div className="max-w-2xl space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-[#111827]">Membros da Equipe</h2>
-                <button className="px-4 py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">
+                <button onClick={() => setInviteOpen(true)} className="px-4 py-2 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">
                   Convidar Membro
                 </button>
               </div>
+              {inviteOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/40" onClick={() => setInviteOpen(false)} />
+                  <div className="relative bg-white rounded-2xl shadow-2xl w-[400px] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-[#111827]">Convidar Membro</h3>
+                      <button onClick={() => setInviteOpen(false)}><X size={16} className="text-gray-400" /></button>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1">Email</label>
+                        <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="email@empresa.com.br" className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1">Perfil</label>
+                        <select className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                          <option>Atendimento</option><option>SDR</option><option>Closer</option><option>Admin</option>
+                        </select>
+                      </div>
+                      <button onClick={sendInvite} className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${inviteSent ? "bg-[#10B981] text-white" : "bg-[#6C3BFF] text-white hover:bg-[#5930e8]"}`}>
+                        {inviteSent ? "✓ Convite enviado!" : "Enviar Convite"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full">
                   <thead>
@@ -155,11 +216,126 @@ export default function ConfiguracoesPage() {
             </div>
           )}
 
-          {(activeTab === "notificacoes" || activeTab === "seguranca" || activeTab === "aparencia") && (
-            <div className="max-w-lg">
-              <h2 className="text-lg font-semibold text-[#111827] mb-6 capitalize">{tabs.find(t => t.id === activeTab)?.label}</h2>
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <p className="text-sm text-gray-400">Em breve...</p>
+          {activeTab === "notificacoes" && (
+            <div className="max-w-lg space-y-6">
+              <h2 className="text-lg font-semibold text-[#111827]">Notificações</h2>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5">
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Eventos</p>
+                  <div className="space-y-3">
+                    {[
+                      { key: "newMessage",      label: "Nova mensagem recebida" },
+                      { key: "newLead",         label: "Novo lead qualificado" },
+                      { key: "orderConfirmed",  label: "Pedido confirmado" },
+                      { key: "liveAlert",       label: "Alertas de live ao vivo" },
+                      { key: "dailySummary",    label: "Resumo diário (18h)" },
+                      { key: "weeklyReport",    label: "Relatório semanal" },
+                    ].map(({ key, label }) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">{label}</span>
+                        <Toggle checked={notifs[key as keyof typeof notifs]} onChange={(v) => setNotifs((n) => ({ ...n, [key]: v }))} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t border-gray-100 pt-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Canais de notificação</p>
+                  <div className="space-y-3">
+                    {[
+                      { key: "whatsapp", label: "WhatsApp" },
+                      { key: "email",   label: "Email" },
+                      { key: "browser", label: "Navegador (push)" },
+                    ].map(({ key, label }) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">{label}</span>
+                        <Toggle checked={notifs[key as keyof typeof notifs]} onChange={(v) => setNotifs((n) => ({ ...n, [key]: v }))} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={saveProfile} className={`px-5 py-2 text-white text-sm font-medium rounded-lg transition-colors ${saved ? "bg-[#10B981]" : "bg-[#6C3BFF] hover:bg-[#5930e8]"}`}>
+                  {saved ? "✓ Salvo!" : "Salvar Preferências"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "seguranca" && (
+            <div className="max-w-lg space-y-6">
+              <h2 className="text-lg font-semibold text-[#111827]">Segurança</h2>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <p className="text-sm font-semibold text-gray-700">Alterar Senha</p>
+                {[
+                  { label: "Senha atual", placeholder: "••••••••" },
+                  { label: "Nova senha", placeholder: "Mínimo 8 caracteres" },
+                  { label: "Confirmar nova senha", placeholder: "Repita a nova senha" },
+                ].map((f) => (
+                  <div key={f.label}>
+                    <label className="text-xs font-medium text-gray-500 block mb-1">{f.label}</label>
+                    <div className="relative">
+                      <input type={showPass ? "text" : "password"} placeholder={f.placeholder} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+                      <button onClick={() => setShowPass((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <button onClick={saveProfile} className={`px-5 py-2 text-white text-sm font-medium rounded-lg transition-colors ${saved ? "bg-[#10B981]" : "bg-[#6C3BFF] hover:bg-[#5930e8]"}`}>
+                  {saved ? "✓ Senha alterada!" : "Alterar Senha"}
+                </button>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <p className="text-sm font-semibold text-gray-700">Autenticação de dois fatores</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">2FA via app autenticador</p>
+                    <p className="text-xs text-gray-400">Recomendado para maior segurança</p>
+                  </div>
+                  <Toggle checked={false} onChange={() => {}} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "aparencia" && (
+            <div className="max-w-lg space-y-6">
+              <h2 className="text-lg font-semibold text-[#111827]">Aparência</h2>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {darkMode ? <Moon size={15} className="text-[#6C3BFF]" /> : <Sun size={15} className="text-amber-500" />}
+                    <div>
+                      <p className="text-sm text-gray-700 font-medium">Modo Escuro</p>
+                      <p className="text-xs text-gray-400">Interface com tema escuro</p>
+                    </div>
+                  </div>
+                  <Toggle checked={darkMode} onChange={setDarkMode} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700 font-medium">Modo Compacto</p>
+                    <p className="text-xs text-gray-400">Reduz espaçamentos da interface</p>
+                  </div>
+                  <Toggle checked={compactMode} onChange={setCompactMode} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700 font-medium">Modo Acessível (daltonismo)</p>
+                    <p className="text-xs text-gray-400">Cores de alto contraste</p>
+                  </div>
+                  <Toggle checked={colorBlind} onChange={setColorBlind} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Cor de destaque</p>
+                  <div className="flex gap-2">
+                    {["#6C3BFF","#0ea5e9","#10B981","#f59e0b","#ef4444","#ec4899"].map((c) => (
+                      <button key={c} className="w-7 h-7 rounded-full border-2 border-white shadow-sm ring-2 ring-transparent hover:ring-gray-300 transition-all" style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                </div>
+                <button onClick={saveProfile} className={`px-5 py-2 text-white text-sm font-medium rounded-lg transition-colors ${saved ? "bg-[#10B981]" : "bg-[#6C3BFF] hover:bg-[#5930e8]"}`}>
+                  {saved ? "✓ Salvo!" : "Salvar Aparência"}
+                </button>
               </div>
             </div>
           )}

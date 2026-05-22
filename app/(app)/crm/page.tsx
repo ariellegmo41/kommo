@@ -151,9 +151,9 @@ function LeadCard({ lead, accent, onOpen, onDragStart, onDragEnd }: {
 
 // ─── LeadDrawer ───────────────────────────────────────────────────────────────
 
-function LeadDrawer({ lead, stageId, stages, onClose, onMove }: {
+function LeadDrawer({ lead, stageId, stages, onClose, onMove, onRemove }: {
   lead: Lead; stageId: string; stages: Stage[];
-  onClose: () => void; onMove: (toStageId: string) => void;
+  onClose: () => void; onMove: (toStageId: string) => void; onRemove: () => void;
 }) {
   const [tab, setTab] = useState<"info" | "historico" | "notas">("info");
   const [note, setNote] = useState(lead.note);
@@ -315,10 +315,10 @@ function LeadDrawer({ lead, stageId, stages, onClose, onMove }: {
               {/* Win / Loss */}
               <div className="space-y-2 pt-1">
                 <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Gestão</p>
-                <button className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-[#10B981]/10 text-[#10B981] text-sm font-semibold hover:bg-[#10B981]/20 transition-colors">
+                <button onClick={onRemove} className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-[#10B981]/10 text-[#10B981] text-sm font-semibold hover:bg-[#10B981]/20 transition-colors">
                   <Check size={15} /> Marcar como Ganho
                 </button>
-                <button className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-50 text-red-500 text-sm font-semibold hover:bg-red-100 transition-colors">
+                <button onClick={onRemove} className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-50 text-red-500 text-sm font-semibold hover:bg-red-100 transition-colors">
                   <X size={15} /> Marcar como Perdido
                 </button>
               </div>
@@ -367,6 +367,67 @@ function LeadDrawer({ lead, stageId, stages, onClose, onMove }: {
   );
 }
 
+// ─── NewLeadModal ─────────────────────────────────────────────────────────────
+
+function NewLeadModal({ stages, onClose, onAdd }: { stages: Stage[]; onClose: () => void; onAdd: (lead: Lead, stageId: string) => void }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [channel, setChannel] = useState("WhatsApp");
+  const [stageId, setStageId] = useState(stages[0].id);
+  const [value, setValue] = useState("R$ 0");
+
+  function submit() {
+    if (!name.trim()) return;
+    const lead: Lead = {
+      id: String(Date.now()), name, phone, email, value, channel, score: 50,
+      avatar: name[0].toUpperCase(), tags: ["Novo"], days: 0, note: "", history: [{ time: "Agora", text: "Lead criado manualmente" }],
+    };
+    onAdd(lead, stageId);
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-[440px] p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-semibold text-[#111827]">Novo Lead</h3>
+          <button onClick={onClose}><X size={16} className="text-gray-400" /></button>
+        </div>
+        <div className="space-y-3">
+          {[
+            { label: "Nome *", value: name, onChange: setName, placeholder: "Nome completo" },
+            { label: "Telefone", value: phone, onChange: setPhone, placeholder: "+55 11 99999-0000" },
+            { label: "Email", value: email, onChange: setEmail, placeholder: "email@exemplo.com" },
+            { label: "Valor estimado", value, onChange: setValue, placeholder: "R$ 0" },
+          ].map((f) => (
+            <div key={f.label}>
+              <label className="text-xs font-medium text-gray-500 block mb-1">{f.label}</label>
+              <input value={f.value} onChange={(e) => f.onChange(e.target.value)} placeholder={f.placeholder} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+            </div>
+          ))}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-gray-500 block mb-1">Canal</label>
+              <select value={channel} onChange={(e) => setChannel(e.target.value)} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                {["WhatsApp","Instagram","TikTok","Email"].map((c) => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 block mb-1">Etapa</label>
+              <select value={stageId} onChange={(e) => setStageId(e.target.value)} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                {stages.map((s) => <option key={s.id} value={s.id}>{s.shortLabel}</option>)}
+              </select>
+            </div>
+          </div>
+          <button onClick={submit} className="w-full py-2.5 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors mt-1">Adicionar Lead</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── CRMPage ──────────────────────────────────────────────────────────────────
 
 export default function CRMPage() {
@@ -374,6 +435,11 @@ export default function CRMPage() {
   const [dragging, setDragging] = useState<{ leadId: string; fromStageId: string } | null>(null);
   const [dragOver, setDragOver] = useState<string | null>(null);
   const [selected, setSelected] = useState<{ lead: Lead; stageId: string } | null>(null);
+  const [showNewLead, setShowNewLead] = useState(false);
+
+  function addLead(lead: Lead, stageId: string) {
+    setStages((prev) => prev.map((s) => s.id === stageId ? { ...s, leads: [lead, ...s.leads] } : s));
+  }
 
   function moveLead(leadId: string, fromId: string, toId: string) {
     if (fromId === toId) return;
@@ -412,8 +478,10 @@ export default function CRMPage() {
       <Topbar
         title="CRM — Pipeline"
         subtitle={`${allLeads.length} clientes · R$ ${totalValue.toLocaleString("pt-BR", { minimumFractionDigits: 0 })} em pipeline`}
-        action={{ label: "Novo Lead", onClick: () => {} }}
+        action={{ label: "Novo Lead", onClick: () => setShowNewLead(true) }}
       />
+
+      {showNewLead && <NewLeadModal stages={stages} onClose={() => setShowNewLead(false)} onAdd={addLead} />}
 
       <div className="flex-1 overflow-x-auto bg-[#F0F2F8] p-5">
         <div className="flex gap-5 h-full min-w-max">
@@ -478,7 +546,7 @@ export default function CRMPage() {
                     </div>
                   )}
 
-                  <button className="w-full py-2.5 flex items-center justify-center gap-1.5 text-gray-400 hover:text-[#6C3BFF] hover:bg-[#6C3BFF]/5 rounded-xl border-2 border-dashed border-gray-200 hover:border-[#6C3BFF]/30 transition-all text-xs font-medium">
+                  <button onClick={() => setShowNewLead(true)} className="w-full py-2.5 flex items-center justify-center gap-1.5 text-gray-400 hover:text-[#6C3BFF] hover:bg-[#6C3BFF]/5 rounded-xl border-2 border-dashed border-gray-200 hover:border-[#6C3BFF]/30 transition-all text-xs font-medium">
                     <Plus size={13} /> Adicionar Lead
                   </button>
                 </div>
@@ -502,6 +570,10 @@ export default function CRMPage() {
           stages={stages}
           onClose={() => setSelected(null)}
           onMove={(toId) => moveLead(selected.lead.id, selected.stageId, toId)}
+          onRemove={() => {
+            setStages((prev) => prev.map((s) => s.id === selected.stageId ? { ...s, leads: s.leads.filter((l) => l.id !== selected.lead.id) } : s));
+            setSelected(null);
+          }}
         />
       )}
     </div>

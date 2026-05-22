@@ -4,7 +4,7 @@ import Topbar from "@/components/Topbar";
 import { useState } from "react";
 import {
   Search, MoreHorizontal, MessageSquare, Check,
-  ShoppingCart, DollarSign, Clock, Package,
+  ShoppingCart, DollarSign, Clock, Package, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +71,12 @@ export default function PedidosPage() {
   const [statusFilter, setStatusFilter] = useState<Status | "Todos">("Todos");
   const [search, setSearch]   = useState("");
   const [selected, setSelected] = useState<Order>(orders[0]);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
+  }
 
   const filtered = orders.filter((o) =>
     (statusFilter === "Todos" || o.status === statusFilter) &&
@@ -89,10 +95,15 @@ export default function PedidosPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-[#111827] text-white px-4 py-3 rounded-xl shadow-xl text-sm font-medium flex items-center gap-2">
+          <Check size={14} className="text-[#10B981]" /> {toast}
+        </div>
+      )}
       <Topbar
         title="Pedidos"
         subtitle={`${orders.length} pedidos · R$ ${orders.reduce((s, o) => s + o.value, 0).toLocaleString("pt-BR")} em total`}
-        action={{ label: "Novo Pedido", onClick: () => {} }}
+        action={{ label: "Novo Pedido", onClick: () => showToast("Para criar um pedido, inicie o atendimento no Inbox e confirme pelo CRM.") }}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -270,11 +281,11 @@ export default function PedidosPage() {
 
             {/* Actions */}
             <div className="space-y-2">
-              <button className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#25D366] text-white rounded-xl text-sm font-medium hover:bg-[#20bd5a] transition-colors">
+              <button onClick={() => showToast(`Abrindo WhatsApp para ${selected.customer}...`)} className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#25D366] text-white rounded-xl text-sm font-medium hover:bg-[#20bd5a] transition-colors">
                 <MessageSquare size={14} /> Contatar Cliente
               </button>
               {selected.status === "Aguardando Pagamento" && (
-                <button className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#6C3BFF] text-white rounded-xl text-sm font-medium hover:bg-[#5930e8] transition-colors">
+                <button onClick={() => showToast("Link de pagamento PIX copiado e enviado para o cliente!")} className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#6C3BFF] text-white rounded-xl text-sm font-medium hover:bg-[#5930e8] transition-colors">
                   Enviar Link de Pagamento
                 </button>
               )}

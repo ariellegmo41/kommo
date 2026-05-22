@@ -2,7 +2,7 @@
 
 import Topbar from "@/components/Topbar";
 import { useState } from "react";
-import { Search, Filter, MessageSquare, Phone, MoreHorizontal, Flame, ArrowUpDown } from "lucide-react";
+import { Search, Filter, MessageSquare, Phone, MoreHorizontal, Flame, ArrowUpDown, X, Plus, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const leads = [
@@ -38,22 +38,85 @@ const tagColors: Record<string, string> = {
   "Look Festa": "bg-rose-100 text-rose-700",
 };
 
+const stages = ["Todos", "Novo Interesse", "Consultoria de Estilo", "Proposta Enviada", "Aguardando Pagamento", "Pedido Confirmado"];
+const channels = ["Todos", "WhatsApp", "Instagram", "TikTok"];
+
 export default function LeadsPage() {
   const [search, setSearch] = useState("");
+  const [stageFilter, setStageFilter] = useState("Todos");
+  const [channelFilter, setChannelFilter] = useState("Todos");
+  const [sortBy, setSortBy] = useState<"name" | "score" | "value" | "created">("name");
+  const [showFilter, setShowFilter] = useState(false);
+  const [showSort, setShowSort] = useState(false);
+  const [showNewLead, setShowNewLead] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [newChannel, setNewChannel] = useState("WhatsApp");
+  const [leadList, setLeadList] = useState(leads);
 
-  const filtered = leads.filter(
-    (l) =>
-      l.name.toLowerCase().includes(search.toLowerCase()) ||
-      l.company.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = leadList
+    .filter((l) => {
+      const matchSearch = l.name.toLowerCase().includes(search.toLowerCase()) || l.email.toLowerCase().includes(search.toLowerCase());
+      const matchStage = stageFilter === "Todos" || l.stage === stageFilter;
+      const matchChannel = channelFilter === "Todos" || l.channel === channelFilter;
+      return matchSearch && matchStage && matchChannel;
+    })
+    .sort((a, b) => {
+      if (sortBy === "score") return b.score - a.score;
+      if (sortBy === "value") return parseFloat(b.value.replace(/[R$.\s]/g, "").replace(",", ".")) - parseFloat(a.value.replace(/[R$.\s]/g, "").replace(",", "."));
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      return 0;
+    });
+
+  function addLead() {
+    if (!newName.trim()) return;
+    setLeadList((prev) => [{
+      id: prev.length + 11, name: newName, company: "-",
+      email: newEmail, phone: newPhone, channel: newChannel as typeof leads[0]["channel"],
+      stage: "Novo Interesse", score: 50, value: "R$ 0", tags: ["Novo"], created: "Agora",
+    }, ...prev]);
+    setNewName(""); setNewEmail(""); setNewPhone(""); setShowNewLead(false);
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <Topbar
         title="Leads"
-        subtitle={`${leads.length} clientes no pipeline · Bella Modas`}
-        action={{ label: "Novo Lead", onClick: () => {} }}
+        subtitle={`${leadList.length} clientes no pipeline · Bella Modas`}
+        action={{ label: "Novo Lead", onClick: () => setShowNewLead(true) }}
       />
+
+      {showNewLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowNewLead(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-[420px] p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-semibold text-[#111827]">Novo Lead</h3>
+              <button onClick={() => setShowNewLead(false)}><X size={16} className="text-gray-400" /></button>
+            </div>
+            <div className="space-y-3">
+              {[
+                { label: "Nome *", value: newName, onChange: setNewName, placeholder: "Nome completo", type: "text" },
+                { label: "Email", value: newEmail, onChange: setNewEmail, placeholder: "email@exemplo.com", type: "email" },
+                { label: "Telefone", value: newPhone, onChange: setNewPhone, placeholder: "+55 11 99999-0000", type: "tel" },
+              ].map((f) => (
+                <div key={f.label}>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">{f.label}</label>
+                  <input type={f.type} value={f.value} onChange={(e) => f.onChange(e.target.value)} placeholder={f.placeholder} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20" />
+                </div>
+              ))}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Canal</label>
+                <select value={newChannel} onChange={(e) => setNewChannel(e.target.value)} className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                  {["WhatsApp","Instagram","TikTok"].map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <button onClick={addLead} className="w-full py-2.5 bg-[#6C3BFF] text-white text-sm font-medium rounded-lg hover:bg-[#5930e8] transition-colors">Adicionar Lead</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-hidden flex flex-col p-6 gap-4">
         {/* Filters */}
@@ -68,12 +131,48 @@ export default function LeadsPage() {
               className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
             />
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <Filter size={14} /> Filtrar
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <ArrowUpDown size={14} /> Ordenar
-          </button>
+          <div className="relative">
+            <button onClick={() => { setShowFilter((v) => !v); setShowSort(false); }} className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <Filter size={14} /> Filtrar {(stageFilter !== "Todos" || channelFilter !== "Todos") && <span className="w-1.5 h-1.5 bg-[#6C3BFF] rounded-full" />}
+            </button>
+            {showFilter && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowFilter(false)} />
+                <div className="absolute top-10 left-0 z-20 bg-white rounded-xl shadow-xl border border-gray-200 p-4 w-64 space-y-3">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-1.5">Etapa</p>
+                    <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value)} className="w-full px-2 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                      {stages.map((s) => <option key={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-1.5">Canal</p>
+                    <select value={channelFilter} onChange={(e) => setChannelFilter(e.target.value)} className="w-full px-2 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none">
+                      {channels.map((c) => <option key={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <button onClick={() => { setStageFilter("Todos"); setChannelFilter("Todos"); setShowFilter(false); }} className="w-full py-1.5 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg">Limpar filtros</button>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="relative">
+            <button onClick={() => { setShowSort((v) => !v); setShowFilter(false); }} className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <ArrowUpDown size={14} /> Ordenar <ChevronDown size={12} />
+            </button>
+            {showSort && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowSort(false)} />
+                <div className="absolute top-10 left-0 z-20 bg-white rounded-xl shadow-xl border border-gray-200 p-2 w-48">
+                  {([["name","Nome A-Z"],["score","Score (maior)"],["value","Valor (maior)"]] as const).map(([key, label]) => (
+                    <button key={key} onClick={() => { setSortBy(key); setShowSort(false); }} className={cn("w-full text-left px-3 py-2 text-sm rounded-lg transition-colors", sortBy === key ? "bg-[#6C3BFF]/10 text-[#6C3BFF] font-medium" : "text-gray-600 hover:bg-gray-50")}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Table */}

@@ -151,11 +151,55 @@ const tagColors: Record<string, string> = {
 
 const filters = ["Todos", "Abertos", "Pendentes", "Resolvidos", "Não lidos"];
 
+const iaSuggestion = "Sim Fernanda! Aceitamos Pix com 5% de desconto e parcelamos em até 6x no cartão sem juros. Posso reservar o vestido para você?";
+
 export default function InboxPage() {
   const [selected, setSelected] = useState<Conversation>(conversations[0]);
   const [activeFilter, setActiveFilter] = useState("Todos");
+  const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
+  const [msgList, setMsgList] = useState(messages);
   const [activeTab, setActiveTab] = useState<"info" | "pipeline" | "notas">("info");
+  const [note, setNote] = useState("");
+  const [noteSaved, setNoteSaved] = useState(false);
+  const [pipelineStage, setPipelineStage] = useState(1);
+
+  const pipelineStages = ["Novo Interesse", "Consultoria de Estilo", "Proposta Enviada", "Aguardando Pagamento", "Pedido Confirmado"];
+
+  const filteredConversations = conversations.filter((c) => {
+    const matchSearch = search === "" || c.contact.toLowerCase().includes(search.toLowerCase()) || c.lastMessage.toLowerCase().includes(search.toLowerCase());
+    const matchFilter =
+      activeFilter === "Todos" ||
+      (activeFilter === "Abertos" && c.status === "open") ||
+      (activeFilter === "Pendentes" && c.status === "pending") ||
+      (activeFilter === "Resolvidos" && c.status === "resolved") ||
+      (activeFilter === "Não lidos" && c.unread > 0);
+    return matchSearch && matchFilter;
+  });
+
+  function sendMessage() {
+    if (!message.trim()) return;
+    const newMsg = {
+      id: msgList.length + 1,
+      from: "agent" as const,
+      text: message.trim(),
+      time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      read: true,
+    };
+    setMsgList((prev) => [...prev, newMsg]);
+    setMessage("");
+  }
+
+  function saveNote() {
+    setNoteSaved(true);
+    setTimeout(() => setNoteSaved(false), 2500);
+  }
+
+  function advanceStage() {
+    if (pipelineStage < pipelineStages.length - 1) {
+      setPipelineStage((s) => s + 1);
+    }
+  }
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -167,6 +211,8 @@ export default function InboxPage() {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar conversas..."
               className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
             />
@@ -190,7 +236,10 @@ export default function InboxPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {conversations.map((conv) => {
+          {filteredConversations.length === 0 && (
+            <div className="p-6 text-center text-sm text-gray-400">Nenhuma conversa encontrada.</div>
+          )}
+          {filteredConversations.map((conv) => {
             const ch = channelIcons[conv.channel];
             return (
               <div
@@ -263,14 +312,14 @@ export default function InboxPage() {
         <div className="mx-4 mt-3 px-3 py-2 bg-[#6C3BFF]/10 border border-[#6C3BFF]/20 rounded-lg flex items-center gap-2 flex-shrink-0">
           <Bot size={14} className="text-[#6C3BFF]" />
           <p className="text-xs text-[#6C3BFF] flex-1">
-            <strong>IA sugere:</strong> &quot;Sim Fernanda! Aceitamos Pix com 5% de desconto e parcelamos em até 6x no cartão sem juros. Posso reservar o vestido para você?&quot;
+            <strong>IA sugere:</strong> &quot;{iaSuggestion}&quot;
           </p>
-          <button className="text-xs text-[#6C3BFF] font-medium hover:underline flex-shrink-0">Usar</button>
+          <button onClick={() => setMessage(iaSuggestion)} className="text-xs text-[#6C3BFF] font-medium hover:underline flex-shrink-0">Usar</button>
         </div>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-          {messages.map((msg) => (
+          {msgList.map((msg) => (
             <div
               key={msg.id}
               className={cn("flex", msg.from === "agent" ? "justify-end" : "justify-start")}
@@ -302,7 +351,8 @@ export default function InboxPage() {
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Digite sua mensagem..."
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                placeholder="Digite sua mensagem... (Enter para enviar)"
                 rows={1}
                 className="flex-1 bg-transparent text-sm text-gray-700 resize-none focus:outline-none min-h-[20px] max-h-24"
               />
@@ -312,15 +362,18 @@ export default function InboxPage() {
                 <button className="text-gray-400 hover:text-gray-600 transition-colors"><Mic size={18} /></button>
               </div>
             </div>
-            <button className="w-10 h-10 bg-[#6C3BFF] rounded-xl flex items-center justify-center text-white hover:bg-[#5930e8] transition-colors flex-shrink-0">
+            <button
+              onClick={sendMessage}
+              className="w-10 h-10 bg-[#6C3BFF] rounded-xl flex items-center justify-center text-white hover:bg-[#5930e8] transition-colors flex-shrink-0"
+            >
               <Send size={16} />
             </button>
           </div>
           <div className="flex items-center gap-3 mt-2">
-            <button className="text-xs text-gray-400 hover:text-[#6C3BFF] transition-colors flex items-center gap-1">
+            <button onClick={() => setMessage("Olá! Que bom falar com você 😊 Como posso ajudar hoje?")} className="text-xs text-gray-400 hover:text-[#6C3BFF] transition-colors flex items-center gap-1">
               <Zap size={12} /> Respostas rápidas
             </button>
-            <button className="text-xs text-gray-400 hover:text-[#6C3BFF] transition-colors flex items-center gap-1">
+            <button onClick={() => { setActiveTab("notas"); }} className="text-xs text-gray-400 hover:text-[#6C3BFF] transition-colors flex items-center gap-1">
               <StickyNote size={12} /> Nota interna
             </button>
           </div>
@@ -425,32 +478,45 @@ export default function InboxPage() {
         {activeTab === "pipeline" && (
           <div className="p-4 space-y-3">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Etapa Atual</p>
-            {["Novo Interesse", "Consultoria de Estilo", "Proposta Enviada", "Aguardando Pagamento", "Pedido Confirmado"].map((stage, i) => (
+            {pipelineStages.map((stage, i) => (
               <div key={stage} className="flex items-center gap-2">
                 <div className={cn(
                   "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold",
-                  i <= 1 ? "border-[#6C3BFF] bg-[#6C3BFF] text-white" : "border-gray-200 text-gray-400"
+                  i < pipelineStage ? "border-[#10B981] bg-[#10B981] text-white" :
+                  i === pipelineStage ? "border-[#6C3BFF] bg-[#6C3BFF] text-white" :
+                  "border-gray-200 text-gray-400"
                 )}>
-                  {i <= 1 ? "✓" : i + 1}
+                  {i < pipelineStage ? "✓" : i + 1}
                 </div>
-                <span className={cn("text-sm", i <= 1 ? "text-[#111827] font-medium" : "text-gray-400")}>{stage}</span>
+                <span className={cn("text-sm", i <= pipelineStage ? "text-[#111827] font-medium" : "text-gray-400")}>{stage}</span>
               </div>
             ))}
-            <button className="w-full mt-3 py-2 border border-[#6C3BFF] text-[#6C3BFF] rounded-lg text-sm font-medium hover:bg-[#6C3BFF]/5 transition-colors">
-              Avançar Etapa <ChevronRight size={14} className="inline" />
-            </button>
+            {pipelineStage < pipelineStages.length - 1 ? (
+              <button onClick={advanceStage} className="w-full mt-3 py-2 border border-[#6C3BFF] text-[#6C3BFF] rounded-lg text-sm font-medium hover:bg-[#6C3BFF]/5 transition-colors">
+                Avançar para {pipelineStages[pipelineStage + 1]} <ChevronRight size={14} className="inline" />
+              </button>
+            ) : (
+              <div className="w-full mt-3 py-2 bg-[#10B981]/10 text-[#10B981] rounded-lg text-sm font-medium text-center">
+                ✓ Pedido Confirmado
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === "notas" && (
           <div className="p-4">
             <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
               rows={5}
               placeholder="Adicionar nota interna..."
               className="w-full text-sm bg-gray-50 border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20 resize-none"
             />
-            <button className="mt-2 w-full py-2 bg-[#6C3BFF] text-white rounded-lg text-sm font-medium hover:bg-[#5930e8] transition-colors">
-              Salvar Nota
+            <button
+              onClick={saveNote}
+              className={cn("mt-2 w-full py-2 rounded-lg text-sm font-medium transition-colors", noteSaved ? "bg-[#10B981] text-white" : "bg-[#6C3BFF] text-white hover:bg-[#5930e8]")}
+            >
+              {noteSaved ? "Nota salva!" : "Salvar Nota"}
             </button>
           </div>
         )}
