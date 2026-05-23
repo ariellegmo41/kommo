@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Radio, Search, ShoppingCart, AlertTriangle, CheckCircle2,
   Clock, MessageSquare, Users, X, Plus, Zap, ChevronRight,
@@ -105,12 +106,15 @@ function cartTotal(items: CartItem[]) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AoVivoPage() {
+  const router = useRouter();
   const [seconds, setSeconds] = useState(23 * 60 + 47);
   const [code, setCode]       = useState("");
   const [selectedSize, setSize] = useState("");
   const [added, setAdded]     = useState(false);
   const [carts, setCarts]     = useState<Cart[]>(initialCarts);
   const [cartFilter, setCartFilter] = useState<"todos" | "aguardando" | "pago" | "expirando">("todos");
+  const [toast, setToast]     = useState<string | null>(null);
+  const [showEndModal, setShowEndModal] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -124,15 +128,33 @@ export default function AoVivoPage() {
     ? liveProducts.find((p) => p.code.startsWith(code) || p.name.toLowerCase().includes(code.toLowerCase()))
     : null;
 
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }
+
   function handleAdd() {
     if (!found || !selectedSize || found.sizes[selectedSize] === 0) return;
     setAdded(true);
     setTimeout(() => { setAdded(false); setCode(""); setSize(""); }, 1600);
   }
 
+  function sendLink(cart: Cart, urgent = false) {
+    const amt = cartTotal(cart.items).toFixed(2).replace(".", ",");
+    const link = `pay.superlive.com.br/c/${cart.id}`;
+    showToast(`${urgent ? "⚡ Urgente:" : "🔗 Link"} enviado para ${cart.customer} (${cart.channel}) · R$ ${amt}`);
+    // In production: POST /api/send-payment-link with cart.id, cart.channel, link
+    void link;
+  }
+
+  function cancelCart(cartId: string) {
+    setCarts((prev) => prev.filter((c) => c.id !== cartId));
+    showToast("Carrinho cancelado e cliente notificado.");
+  }
+
   const paidCount = carts.filter(c => c.status === "pago").length;
   const totalRevenue = carts.filter(c => c.status === "pago").reduce((s, c) => s + cartTotal(c.items), 0)
-    + 3420 - 259.90; // base revenue from the demo
+    + 3420 - 259.90;
 
   const filteredCarts = cartFilter === "todos"
     ? carts
@@ -157,7 +179,10 @@ export default function AoVivoPage() {
           <span className="flex items-center gap-1"><Users size={11} />156 vendo</span>
         </div>
         <div className="flex-1" />
-        <button className="flex items-center gap-2 bg-red-900/40 hover:bg-red-900/60 text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-800/40 transition-colors">
+        <button
+          onClick={() => setShowEndModal(true)}
+          className="flex items-center gap-2 bg-red-900/40 hover:bg-red-900/60 text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-800/40 transition-colors"
+        >
           <X size={13} /> Encerrar Live
         </button>
       </div>
@@ -352,24 +377,39 @@ export default function AoVivoPage() {
                       Total: R$ {total.toFixed(2).replace(".", ",")}
                     </span>
                     {isPaid ? (
-                      <button className="text-xs text-[#10B981] font-medium hover:underline flex items-center gap-1">
+                      <button
+                        onClick={() => router.push("/pedidos")}
+                        className="text-xs text-[#10B981] font-medium hover:underline flex items-center gap-1"
+                      >
                         Ver Pedido <ChevronRight size={11} />
                       </button>
                     ) : isExpiring ? (
                       <div className="flex gap-2">
-                        <button className="text-xs bg-red-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-red-600 transition-colors">
+                        <button
+                          onClick={() => sendLink(cart, true)}
+                          className="text-xs bg-red-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-red-600 transition-colors"
+                        >
                           Enviar Link Urgente
                         </button>
-                        <button className="text-xs text-white/40 hover:text-white/70 px-2 py-1.5 rounded-lg border border-white/10">
+                        <button
+                          onClick={() => cancelCart(cart.id)}
+                          className="text-xs text-white/40 hover:text-white/70 px-2 py-1.5 rounded-lg border border-white/10"
+                        >
                           Cancelar
                         </button>
                       </div>
                     ) : (
                       <div className="flex gap-2">
-                        <button className="text-xs bg-[#6C3BFF] text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-[#5a2fd6] transition-colors flex items-center gap-1">
+                        <button
+                          onClick={() => sendLink(cart)}
+                          className="text-xs bg-[#6C3BFF] text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-[#5a2fd6] transition-colors flex items-center gap-1"
+                        >
                           <MessageSquare size={11} /> Enviar Link
                         </button>
-                        <button className="text-xs text-white/40 hover:text-white/70 px-2 py-1.5 rounded-lg border border-white/10">
+                        <button
+                          onClick={() => showToast(`Abrindo edição do carrinho de ${cart.customer}...`)}
+                          className="text-xs text-white/40 hover:text-white/70 px-2 py-1.5 rounded-lg border border-white/10"
+                        >
                           Editar
                         </button>
                       </div>
@@ -445,6 +485,42 @@ export default function AoVivoPage() {
 
         </div>
       </div>
+
+      {/* Toast notification */}
+      {toast && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-[#1e2d45] border border-white/20 text-white text-sm px-5 py-3 rounded-xl shadow-2xl whitespace-nowrap">
+          {toast}
+        </div>
+      )}
+
+      {/* Encerrar Live confirmation modal */}
+      {showEndModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowEndModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-96 p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <Radio size={22} className="text-red-500" />
+            </div>
+            <h3 className="font-bold text-[#111827] text-lg mb-1">Encerrar a Live?</h3>
+            <p className="text-sm text-gray-500 mb-1">A transmissão será encerrada para todos os espectadores.</p>
+            <p className="text-xs text-gray-400 mb-6">Carrinhos em aberto continuarão válidos por 60 minutos após o encerramento.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowEndModal(false)}
+                className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Continuar Live
+              </button>
+              <button
+                onClick={() => router.push("/lives")}
+                className="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors"
+              >
+                Encerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

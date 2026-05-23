@@ -2,9 +2,10 @@
 
 import Topbar from "@/components/Topbar";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search, Star, MessageSquare, Edit2, Plus, AlertTriangle,
-  Link as LinkIcon, ArrowUpRight, Tag,
+  Link as LinkIcon, ArrowUpRight, Tag, X, CheckCircle2, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +27,7 @@ interface Product {
 
 const categories = ["Todos", "Vestidos", "Conjuntos", "Blusas", "Calças", "Blazers", "Saias"];
 
-const products: Product[] = [
+const initialProducts: Product[] = [
   {
     id: "1", name: "Vestido Midi Floral",   category: "Vestidos",  price: 459, color: "bg-rose-100",   textColor: "text-rose-600",
     stock: 18, rating: 4.9, sales: 87,
@@ -77,6 +78,16 @@ const products: Product[] = [
   },
 ];
 
+const colorOptions = [
+  { bg: "bg-rose-100",   text: "text-rose-600"   },
+  { bg: "bg-stone-200",  text: "text-stone-700"  },
+  { bg: "bg-amber-100",  text: "text-amber-700"  },
+  { bg: "bg-purple-100", text: "text-purple-700" },
+  { bg: "bg-teal-100",   text: "text-teal-700"   },
+  { bg: "bg-slate-200",  text: "text-slate-700"  },
+  { bg: "bg-gray-200",   text: "text-gray-700"   },
+];
+
 function StockBadge({ stock }: { stock: number }) {
   if (stock === 0) return <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">Sem estoque</span>;
   if (stock <= 3)  return <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">Estoque baixo</span>;
@@ -88,21 +99,204 @@ function SizeCell({ qty }: { qty: number }) {
   return <span className={`inline-flex items-center justify-center w-8 h-7 rounded text-xs font-bold ${bg}`}>{qty}</span>;
 }
 
-export default function CatalogoPage() {
-  const [category, setCategory] = useState("Todos");
-  const [search, setSearch]     = useState("");
-  const [selected, setSelected] = useState<Product>(products[0]);
+// ─── New/Edit Product Modal ───────────────────────────────────────────────────
 
-  const filtered = products.filter((p) =>
+function ProductModal({
+  product,
+  onClose,
+  onSave,
+}: {
+  product?: Product;
+  onClose: () => void;
+  onSave: (p: Product) => void;
+}) {
+  const isEdit = !!product;
+  const [name, setName]       = useState(product?.name ?? "");
+  const [category, setCategory] = useState(product?.category ?? "Vestidos");
+  const [price, setPrice]     = useState(product ? String(product.price) : "");
+  const [stock, setStock]     = useState(product ? String(product.stock) : "");
+  const [desc, setDesc]       = useState(product?.desc ?? "");
+  const [colorIdx, setColorIdx] = useState(0);
+  const [saved, setSaved]     = useState(false);
+
+  function save() {
+    if (!name.trim() || !price) return;
+    const col = colorOptions[colorIdx];
+    onSave({
+      id: product?.id ?? String(Date.now()),
+      name: name.trim(),
+      category,
+      price: Number(price),
+      color: product?.color ?? col.bg,
+      textColor: product?.textColor ?? col.text,
+      stock: Number(stock),
+      rating: product?.rating ?? 4.5,
+      sales: product?.sales ?? 0,
+      sizes: product?.sizes ?? { PP: 0, P: 0, M: 0, G: 0, GG: 0 },
+      desc: desc.trim(),
+    });
+    setSaved(true);
+    setTimeout(onClose, 1000);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-[520px] p-6 z-10">
+        {saved ? (
+          <div className="flex flex-col items-center py-8 gap-3">
+            <CheckCircle2 size={40} className="text-[#10B981]" />
+            <p className="font-semibold text-[#111827]">{isEdit ? "Produto atualizado!" : "Produto cadastrado!"}</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-bold text-[#111827] text-base">{isEdit ? "Editar Produto" : "Novo Produto"}</h2>
+              <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X size={16} className="text-gray-400" /></button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Nome</label>
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Ex: Vestido Midi Floral"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Categoria</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                  >
+                    {categories.filter((c) => c !== "Todos").map((c) => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Preço (R$)</label>
+                  <input
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="0,00"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Estoque total</label>
+                  <input
+                    type="number"
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
+                    placeholder="0"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Descrição</label>
+                <textarea
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
+                  rows={2}
+                  placeholder="Descrição do produto..."
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20 resize-none"
+                />
+              </div>
+
+              {!isEdit && (
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Cor do card</label>
+                  <div className="flex gap-2">
+                    {colorOptions.map((c, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setColorIdx(i)}
+                        className={cn("w-8 h-8 rounded-lg border-2 transition-all", c.bg, colorIdx === i ? "border-[#6C3BFF] scale-110" : "border-transparent")}
+                      >
+                        {colorIdx === i && <Check size={14} className="mx-auto text-gray-600" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                Cancelar
+              </button>
+              <button
+                onClick={save}
+                disabled={!name.trim() || !price}
+                className="flex-1 py-2.5 bg-[#6C3BFF] text-white rounded-xl text-sm font-semibold hover:bg-[#5a2fd6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {isEdit ? "Salvar Alterações" : "Cadastrar Produto"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function CatalogoPage() {
+  const router = useRouter();
+  const [productList, setProductList] = useState<Product[]>(initialProducts);
+  const [category, setCategory]   = useState("Todos");
+  const [search, setSearch]       = useState("");
+  const [selected, setSelected]   = useState<Product>(initialProducts[0]);
+  const [showNew, setShowNew]     = useState(false);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [toast, setToast]         = useState<string | null>(null);
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
+  }
+
+  function shareWhatsApp() {
+    const text = `✨ ${selected.name}\n💰 R$ ${selected.price.toLocaleString("pt-BR")}\n📦 ${selected.stock} peças disponíveis\n\n${selected.desc}\n\nAcesse: https://shop.bellamodas.com.br/p/${selected.id}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
+  function copyPayLink() {
+    const link = `https://pay.bellamodas.com.br/p/${selected.id}`;
+    navigator.clipboard.writeText(link).catch(() => {});
+    showToast("🔗 Link de pagamento copiado!");
+  }
+
+  function addProduct(p: Product) {
+    setProductList((prev) => [...prev, p]);
+    setSelected(p);
+  }
+
+  function updateProduct(p: Product) {
+    setProductList((prev) => prev.map((x) => x.id === p.id ? p : x));
+    setSelected(p);
+  }
+
+  const filtered = productList.filter((p) =>
     (category === "Todos" || p.category === category) &&
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const stats = [
-    { label: "Total Produtos",  value: products.length,                             color: "text-[#111827]" },
-    { label: "Ativos",          value: products.filter((p) => p.stock > 0).length,  color: "text-[#10B981]" },
-    { label: "Estoque Baixo",   value: products.filter((p) => p.stock > 0 && p.stock <= 3).length, color: "text-amber-600" },
-    { label: "Sem Estoque",     value: products.filter((p) => p.stock === 0).length, color: "text-red-500" },
+    { label: "Total Produtos",  value: productList.length,                                      color: "text-[#111827]" },
+    { label: "Ativos",          value: productList.filter((p) => p.stock > 0).length,           color: "text-[#10B981]" },
+    { label: "Estoque Baixo",   value: productList.filter((p) => p.stock > 0 && p.stock <= 3).length, color: "text-amber-600" },
+    { label: "Sem Estoque",     value: productList.filter((p) => p.stock === 0).length,         color: "text-red-500" },
   ];
 
   return (
@@ -110,7 +304,7 @@ export default function CatalogoPage() {
       <Topbar
         title="Catálogo de Produtos"
         subtitle="Bella Modas — gerencie produtos e compartilhe via WhatsApp"
-        action={{ label: "Novo Produto", onClick: () => {} }}
+        action={{ label: "Novo Produto", onClick: () => setShowNew(true) }}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -166,7 +360,6 @@ export default function CatalogoPage() {
                     selected.id === p.id ? "border-[#6C3BFF] ring-1 ring-[#6C3BFF]/20" : "border-gray-100"
                   )}
                 >
-                  {/* Image placeholder */}
                   <div className={`${p.color} rounded-t-2xl h-36 flex items-center justify-center relative overflow-hidden`}>
                     <span className={`text-4xl font-black ${p.textColor} opacity-20 select-none`}>{p.name[0]}</span>
                     {p.stock === 0 && (
@@ -180,7 +373,10 @@ export default function CatalogoPage() {
                       </div>
                     )}
                     <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                      <button className="w-6 h-6 bg-white rounded-lg flex items-center justify-center shadow text-gray-600 hover:text-[#6C3BFF]">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelected(p); setEditProduct(p); }}
+                        className="w-6 h-6 bg-white rounded-lg flex items-center justify-center shadow text-gray-600 hover:text-[#6C3BFF]"
+                      >
                         <Edit2 size={11} />
                       </button>
                     </div>
@@ -204,7 +400,10 @@ export default function CatalogoPage() {
               ))}
 
               {/* Add product card */}
-              <button className="bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#6C3BFF]/40 hover:bg-[#6C3BFF]/5 transition-all flex flex-col items-center justify-center gap-2 h-[220px] text-gray-400 hover:text-[#6C3BFF]">
+              <button
+                onClick={() => setShowNew(true)}
+                className="bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#6C3BFF]/40 hover:bg-[#6C3BFF]/5 transition-all flex flex-col items-center justify-center gap-2 h-[220px] text-gray-400 hover:text-[#6C3BFF]"
+              >
                 <Plus size={24} />
                 <span className="text-sm font-medium">Novo Produto</span>
               </button>
@@ -217,7 +416,10 @@ export default function CatalogoPage() {
           <div className={`${selected.color} h-40 flex items-center justify-center flex-shrink-0 relative`}>
             <span className={`text-7xl font-black ${selected.textColor} opacity-20 select-none`}>{selected.name[0]}</span>
             <div className="absolute bottom-3 right-3 flex gap-1.5">
-              <button className="px-2.5 py-1.5 bg-white/90 rounded-lg text-xs font-medium text-gray-700 flex items-center gap-1 hover:bg-white transition-colors shadow-sm">
+              <button
+                onClick={() => setEditProduct(selected)}
+                className="px-2.5 py-1.5 bg-white/90 rounded-lg text-xs font-medium text-gray-700 flex items-center gap-1 hover:bg-white transition-colors shadow-sm"
+              >
                 <Edit2 size={11} /> Editar
               </button>
             </div>
@@ -260,19 +462,47 @@ export default function CatalogoPage() {
 
             <div className="space-y-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Ações Rápidas</p>
-              <button className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#25D366] text-white rounded-xl text-sm font-medium hover:bg-[#20bd5a] transition-colors">
+              <button
+                onClick={shareWhatsApp}
+                className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#25D366] text-white rounded-xl text-sm font-medium hover:bg-[#20bd5a] transition-colors"
+              >
                 <MessageSquare size={15} /> Compartilhar no WhatsApp
               </button>
-              <button className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#6C3BFF] text-white rounded-xl text-sm font-medium hover:bg-[#5930e8] transition-colors">
+              <button
+                onClick={copyPayLink}
+                className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#6C3BFF] text-white rounded-xl text-sm font-medium hover:bg-[#5930e8] transition-colors"
+              >
                 <LinkIcon size={15} /> Gerar Link de Pagamento
               </button>
-              <button className="w-full flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => router.push("/pedidos")}
+                className="w-full flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
                 <ArrowUpRight size={15} /> Ver Pedidos deste Produto
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-[#111827] text-white text-sm px-5 py-3 rounded-xl shadow-xl whitespace-nowrap">
+          {toast}
+        </div>
+      )}
+
+      {showNew && (
+        <ProductModal onClose={() => setShowNew(false)} onSave={addProduct} />
+      )}
+
+      {editProduct && (
+        <ProductModal
+          product={editProduct}
+          onClose={() => setEditProduct(null)}
+          onSave={(p) => { updateProduct(p); setEditProduct(null); }}
+        />
+      )}
     </div>
   );
 }

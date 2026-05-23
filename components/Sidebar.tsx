@@ -7,6 +7,7 @@ import {
   LayoutDashboard, MessageSquare, Users, Kanban, GitBranch, Megaphone,
   Bot, Sparkles, BarChart3, Calendar, Plug, Settings, LogOut, ChevronDown,
   Store, Code2, Palette, Crown, Video, Radio, Tag, ClipboardList, Package, X, Check,
+  BookOpen, Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,11 +32,13 @@ const phase3Nav = [
 ];
 
 const superliveNav = [
-  { href: "/lives",    label: "Lives",     icon: Video,         liveNow: false },
-  { href: "/ao-vivo",  label: "Ao Vivo",   icon: Radio,         liveNow: true  },
-  { href: "/produtos", label: "Produtos",  icon: Tag,           liveNow: false },
-  { href: "/pedidos",  label: "Pedidos",   icon: ClipboardList, liveNow: false },
-  { href: "/estoque",  label: "Estoque",   icon: Package,       liveNow: false },
+  { href: "/lives",      label: "Lives",      icon: Video,         liveNow: false },
+  { href: "/ao-vivo",    label: "Ao Vivo",    icon: Radio,         liveNow: true  },
+  { href: "/produtos",   label: "Produtos",   icon: Tag,           liveNow: false },
+  { href: "/pedidos",    label: "Pedidos",    icon: ClipboardList, liveNow: false },
+  { href: "/estoque",    label: "Estoque",    icon: Package,       liveNow: false },
+  { href: "/catalogo",   label: "Catálogo",   icon: BookOpen,      liveNow: false },
+  { href: "/financeiro", label: "Financeiro", icon: Wallet,        liveNow: false },
 ];
 
 const bottomNav = [

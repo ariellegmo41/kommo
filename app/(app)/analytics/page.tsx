@@ -6,16 +6,83 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, Users, Target, Clock } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Users, Target, Clock, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const revenueData = [
-  { mes: "Jan", receita: 28400, meta: 30000, leads: 410 },
-  { mes: "Fev", receita: 31200, meta: 32000, leads: 487 },
-  { mes: "Mar", receita: 27800, meta: 33000, leads: 392 },
-  { mes: "Abr", receita: 36900, meta: 35000, leads: 560 },
-  { mes: "Mai", receita: 43480, meta: 38000, leads: 643 },
-];
+// ─── Data sets per period ────────────────────────────────────────────────────
+
+const revenueByPeriod: Record<string, { mes: string; receita: number; meta: number; leads: number }[]> = {
+  "Hoje": [
+    { mes: "08h", receita: 0,    meta: 5000, leads: 0  },
+    { mes: "10h", receita: 480,  meta: 5000, leads: 12 },
+    { mes: "12h", receita: 1240, meta: 5000, leads: 28 },
+    { mes: "14h", receita: 1890, meta: 5000, leads: 39 },
+    { mes: "16h", receita: 2650, meta: 5000, leads: 47 },
+    { mes: "18h", receita: 3840, meta: 5000, leads: 52 },
+  ],
+  "7 dias": [
+    { mes: "Seg", receita: 2800,  meta: 3500,  leads: 58  },
+    { mes: "Ter", receita: 3900,  meta: 3500,  leads: 72  },
+    { mes: "Qua", receita: 2200,  meta: 3500,  leads: 44  },
+    { mes: "Qui", receita: 4100,  meta: 3500,  leads: 89  },
+    { mes: "Sex", receita: 5100,  meta: 3500,  leads: 103 },
+    { mes: "Sáb", receita: 2800,  meta: 3500,  leads: 52  },
+    { mes: "Dom", receita: 1200,  meta: 3500,  leads: 24  },
+  ],
+  "30 dias": [
+    { mes: "Jan", receita: 28400, meta: 30000, leads: 410 },
+    { mes: "Fev", receita: 31200, meta: 32000, leads: 487 },
+    { mes: "Mar", receita: 27800, meta: 33000, leads: 392 },
+    { mes: "Abr", receita: 36900, meta: 35000, leads: 560 },
+    { mes: "Mai", receita: 43480, meta: 38000, leads: 643 },
+  ],
+  "Este mês": [
+    { mes: "Sem 1", receita: 9800,  meta: 10000, leads: 148 },
+    { mes: "Sem 2", receita: 11200, meta: 10000, leads: 162 },
+    { mes: "Sem 3", receita: 13480, meta: 12000, leads: 189 },
+    { mes: "Sem 4", receita: 9000,  meta: 10000, leads: 144 },
+  ],
+  "Personalizado": [
+    { mes: "Jan", receita: 28400, meta: 30000, leads: 410 },
+    { mes: "Fev", receita: 31200, meta: 32000, leads: 487 },
+    { mes: "Mar", receita: 27800, meta: 33000, leads: 392 },
+    { mes: "Abr", receita: 36900, meta: 35000, leads: 560 },
+    { mes: "Mai", receita: 43480, meta: 38000, leads: 643 },
+  ],
+};
+
+const kpisByPeriod: Record<string, { label: string; value: string; change: string; up: boolean; icon: typeof Target }[]> = {
+  "Hoje": [
+    { label: "Taxa de Conversão", value: "11,2%",     change: "+1,2%", up: true,  icon: Target    },
+    { label: "Receita do Dia",    value: "R$ 3.840",  change: "+8%",   up: true,  icon: DollarSign },
+    { label: "Atendimentos",      value: "52",        change: "+3%",   up: true,  icon: Users      },
+    { label: "Tempo Médio Resp.", value: "2m 48s",    change: "-12%",  up: true,  icon: Clock      },
+  ],
+  "7 dias": [
+    { label: "Taxa de Conversão", value: "13,1%",     change: "+2,1%", up: true,  icon: Target    },
+    { label: "Receita da Semana", value: "R$ 22.100", change: "+14%",  up: true,  icon: DollarSign },
+    { label: "Atendimentos",      value: "342",       change: "+9%",   up: true,  icon: Users      },
+    { label: "Tempo Médio Resp.", value: "3m 05s",    change: "-19%",  up: true,  icon: Clock      },
+  ],
+  "30 dias": [
+    { label: "Taxa de Conversão", value: "14,4%",      change: "+2,8%", up: true, icon: Target    },
+    { label: "Receita do Mês",    value: "R$ 43.480",  change: "+18%",  up: true, icon: DollarSign },
+    { label: "Atendimentos",      value: "643",         change: "+11%",  up: true, icon: Users     },
+    { label: "Tempo Médio Resp.", value: "3m 12s",      change: "-24%",  up: true, icon: Clock     },
+  ],
+  "Este mês": [
+    { label: "Taxa de Conversão", value: "14,4%",      change: "+2,8%", up: true, icon: Target    },
+    { label: "Receita do Mês",    value: "R$ 43.480",  change: "+18%",  up: true, icon: DollarSign },
+    { label: "Atendimentos",      value: "643",         change: "+11%",  up: true, icon: Users     },
+    { label: "Tempo Médio Resp.", value: "3m 12s",      change: "-24%",  up: true, icon: Clock     },
+  ],
+  "Personalizado": [
+    { label: "Taxa de Conversão", value: "14,4%",      change: "+2,8%", up: true, icon: Target    },
+    { label: "Receita do Mês",    value: "R$ 43.480",  change: "+18%",  up: true, icon: DollarSign },
+    { label: "Atendimentos",      value: "643",         change: "+11%",  up: true, icon: Users     },
+    { label: "Tempo Médio Resp.", value: "3m 12s",      change: "-24%",  up: true, icon: Clock     },
+  ],
+};
 
 const weeklyLeads = [
   { dia: "Seg", whatsapp: 28, instagram: 42, email: 3, outros: 9  },
@@ -50,13 +117,6 @@ const sellerPerf = [
   { name: "Beatriz", deals: 6,  revenue: 1490,  conv: 6  },
 ];
 
-const kpis = [
-  { label: "Taxa de Conversão", value: "14,4%",      change: "+2,8%", up: true, icon: Target },
-  { label: "Receita do Mês",   value: "R$ 43.480", change: "+18%",  up: true, icon: DollarSign },
-  { label: "Atendimentos",     value: "643",        change: "+11%",  up: true, icon: Users },
-  { label: "Tempo Médio Resp.",value: "3m 12s",     change: "-24%",  up: true, icon: Clock },
-];
-
 const periods = ["Hoje", "7 dias", "30 dias", "Este mês", "Personalizado"];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -78,30 +138,56 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState("30 dias");
 
+  const currentKpis    = kpisByPeriod[period] ?? kpisByPeriod["30 dias"];
+  const currentRevenue = revenueByPeriod[period] ?? revenueByPeriod["30 dias"];
+
+  function exportCSV() {
+    const rows = [
+      ["Período", "Receita", "Meta", "Leads"],
+      ...currentRevenue.map((r) => [r.mes, r.receita, r.meta, r.leads]),
+    ];
+    const csv  = rows.map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `analytics-${period.replace(/\s/g, "-")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <Topbar title="Analytics" subtitle="Relatórios e métricas de performance" />
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        {/* Period */}
-        <div className="flex items-center gap-2">
-          {periods.map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={cn(
-                "px-3 py-1.5 text-sm rounded-lg transition-colors",
-                period === p ? "bg-[#6C3BFF] text-white" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-              )}
-            >
-              {p}
-            </button>
-          ))}
+        {/* Period selector + export */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {periods.map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={cn(
+                  "px-3 py-1.5 text-sm rounded-lg transition-colors",
+                  period === p ? "bg-[#6C3BFF] text-white" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                )}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Download size={14} /> Exportar CSV
+          </button>
         </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-4 gap-4">
-          {kpis.map((m) => (
+          {currentKpis.map((m) => (
             <div key={m.label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-9 h-9 bg-[#6C3BFF]/10 rounded-lg flex items-center justify-center">
@@ -118,13 +204,13 @@ export default function AnalyticsPage() {
           ))}
         </div>
 
-        {/* Receita + Leads */}
+        {/* Receita + Origem leads */}
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="font-semibold text-[#111827]">Receita vs Meta</h3>
-                <p className="text-xs text-gray-400 mt-0.5">Evolução mensal</p>
+                <p className="text-xs text-gray-400 mt-0.5">Período: {period}</p>
               </div>
               <div className="flex gap-3 text-xs">
                 <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#6C3BFF] inline-block" /> Receita</span>
@@ -132,7 +218,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={revenueData}>
+              <AreaChart data={currentRevenue}>
                 <defs>
                   <linearGradient id="gradReceita" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6C3BFF" stopOpacity={0.15} />
@@ -181,7 +267,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Leads por canal */}
+        {/* Leads por canal + Performance vendedores */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-[#111827] mb-1">Leads por Canal — Semana</h3>
@@ -201,7 +287,6 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* Performance vendedores */}
           <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-[#111827] mb-1">Performance — Vendedores</h3>
             <p className="text-xs text-gray-400 mb-5">Negócios e receita por agente</p>

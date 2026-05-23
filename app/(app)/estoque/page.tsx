@@ -2,10 +2,11 @@
 
 import Topbar from "@/components/Topbar";
 import { useState } from "react";
-import { AlertTriangle, ArrowUp, ArrowDown, Package, TrendingDown } from "lucide-react";
+import { AlertTriangle, ArrowUp, ArrowDown, Package, TrendingDown, X, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Sizes = { PP: number; P: number; M: number; G: number; GG: number };
+type SizeKey = keyof Sizes;
 
 interface StockItem {
   id: string;
@@ -15,17 +16,6 @@ interface StockItem {
   sizes: Sizes;
   minStock: number;
 }
-
-const stockItems: StockItem[] = [
-  { id: "1", name: "Vestido Midi Floral",    category: "Vestidos",  color: "bg-rose-100",   sizes: { PP: 2, P: 4, M: 7, G: 3, GG: 2 }, minStock: 3 },
-  { id: "2", name: "Conjunto Alfaiataria",   category: "Conjuntos", color: "bg-stone-200",  sizes: { PP: 1, P: 3, M: 4, G: 2, GG: 2 }, minStock: 2 },
-  { id: "3", name: "Blusa Cropped Tricô",   category: "Blusas",    color: "bg-amber-100",  sizes: { PP: 0, P: 1, M: 1, G: 1, GG: 0 }, minStock: 3 },
-  { id: "4", name: "Calça Wide Leg Bege",   category: "Calças",    color: "bg-yellow-50",  sizes: { PP: 0, P: 0, M: 0, G: 0, GG: 0 }, minStock: 2 },
-  { id: "5", name: "Vestido Longo Festa",   category: "Vestidos",  color: "bg-purple-100", sizes: { PP: 1, P: 2, M: 3, G: 1, GG: 0 }, minStock: 2 },
-  { id: "6", name: "Conjunto Jogger Premium",category: "Conjuntos", color: "bg-slate-200",  sizes: { PP: 3, P: 4, M: 4, G: 3, GG: 1 }, minStock: 2 },
-  { id: "7", name: "Blazer Oversized",      category: "Blazers",   color: "bg-gray-200",   sizes: { PP: 2, P: 2, M: 3, G: 1, GG: 1 }, minStock: 2 },
-  { id: "8", name: "Saia Midi Plissada",    category: "Saias",     color: "bg-teal-100",   sizes: { PP: 1, P: 2, M: 2, G: 1, GG: 0 }, minStock: 2 },
-];
 
 interface Movement {
   id: string;
@@ -38,7 +28,18 @@ interface Movement {
   time: string;
 }
 
-const movements: Movement[] = [
+const initialStock: StockItem[] = [
+  { id: "1", name: "Vestido Midi Floral",    category: "Vestidos",  color: "bg-rose-100",   sizes: { PP: 2, P: 4, M: 7, G: 3, GG: 2 }, minStock: 3 },
+  { id: "2", name: "Conjunto Alfaiataria",   category: "Conjuntos", color: "bg-stone-200",  sizes: { PP: 1, P: 3, M: 4, G: 2, GG: 2 }, minStock: 2 },
+  { id: "3", name: "Blusa Cropped Tricô",   category: "Blusas",    color: "bg-amber-100",  sizes: { PP: 0, P: 1, M: 1, G: 1, GG: 0 }, minStock: 3 },
+  { id: "4", name: "Calça Wide Leg Bege",   category: "Calças",    color: "bg-yellow-50",  sizes: { PP: 0, P: 0, M: 0, G: 0, GG: 0 }, minStock: 2 },
+  { id: "5", name: "Vestido Longo Festa",   category: "Vestidos",  color: "bg-purple-100", sizes: { PP: 1, P: 2, M: 3, G: 1, GG: 0 }, minStock: 2 },
+  { id: "6", name: "Conjunto Jogger Premium",category: "Conjuntos", color: "bg-slate-200",  sizes: { PP: 3, P: 4, M: 4, G: 3, GG: 1 }, minStock: 2 },
+  { id: "7", name: "Blazer Oversized",      category: "Blazers",   color: "bg-gray-200",   sizes: { PP: 2, P: 2, M: 3, G: 1, GG: 1 }, minStock: 2 },
+  { id: "8", name: "Saia Midi Plissada",    category: "Saias",     color: "bg-teal-100",   sizes: { PP: 1, P: 2, M: 2, G: 1, GG: 0 }, minStock: 2 },
+];
+
+const initialMovements: Movement[] = [
   { id: "1", product: "Vestido Midi Floral",    type: "saida",   qty: 1, size: "P",  reason: "Pedido #1085",         user: "Carla",   time: "Hoje 10:30" },
   { id: "2", product: "Blazer Oversized",       type: "saida",   qty: 1, size: "M",  reason: "Pedido #1083",         user: "Ana B.",  time: "Hoje 09:15" },
   { id: "3", product: "Blusa Cropped Tricô",   type: "entrada",  qty: 5, size: "M",  reason: "Reposição fornecedor", user: "Carla",   time: "Ontem 16:00" },
@@ -48,8 +49,8 @@ const movements: Movement[] = [
 ];
 
 function SizeCell({ qty, min }: { qty: number; min: number }) {
-  if (qty === 0)      return <td className="px-3 py-3 text-center"><span className="inline-flex items-center justify-center w-9 h-7 rounded-lg text-xs font-bold bg-red-100 text-red-500">0</span></td>;
-  if (qty < min)      return <td className="px-3 py-3 text-center"><span className="inline-flex items-center justify-center w-9 h-7 rounded-lg text-xs font-bold bg-amber-100 text-amber-700">{qty}</span></td>;
+  if (qty === 0)  return <td className="px-3 py-3 text-center"><span className="inline-flex items-center justify-center w-9 h-7 rounded-lg text-xs font-bold bg-red-100 text-red-500">0</span></td>;
+  if (qty < min)  return <td className="px-3 py-3 text-center"><span className="inline-flex items-center justify-center w-9 h-7 rounded-lg text-xs font-bold bg-amber-100 text-amber-700">{qty}</span></td>;
   return <td className="px-3 py-3 text-center"><span className="inline-flex items-center justify-center w-9 h-7 rounded-lg text-xs font-bold bg-green-100 text-green-700">{qty}</span></td>;
 }
 
@@ -73,17 +74,183 @@ const statusLabel: Record<string, { label: string; color: string; bg: string }> 
   zerado:  { label: "Sem estoque",  color: "text-red-700",    bg: "bg-red-200" },
 };
 
-export default function EstoquePage() {
-  const [tab, setTab] = useState<"estoque" | "movimentacoes">("estoque");
+// ─── Registrar Entrada Modal ──────────────────────────────────────────────────
 
-  const alertItems = stockItems.filter((i) => stockStatus(i) === "critico" || stockStatus(i) === "zerado");
+function EntradaModal({
+  products,
+  onClose,
+  onSubmit,
+}: {
+  products: StockItem[];
+  onClose: () => void;
+  onSubmit: (m: Movement) => void;
+}) {
+  const [product, setProduct] = useState(products[0]?.name ?? "");
+  const [type, setType]       = useState<"entrada" | "saida">("entrada");
+  const [size, setSize]       = useState<SizeKey>("M");
+  const [qty, setQty]         = useState("1");
+  const [reason, setReason]   = useState("");
+  const [done, setDone]       = useState(false);
+
+  function submit() {
+    if (!product || !reason.trim() || Number(qty) < 1) return;
+    const now = new Date();
+    const time = `Hoje ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+    onSubmit({
+      id: String(Date.now()),
+      product,
+      type,
+      qty: Number(qty),
+      size,
+      reason: reason.trim(),
+      user: "Carla",
+      time,
+    });
+    setDone(true);
+    setTimeout(onClose, 1200);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-[480px] p-6 z-10">
+        {done ? (
+          <div className="flex flex-col items-center py-8 gap-3">
+            <CheckCircle2 size={40} className="text-[#10B981]" />
+            <p className="font-semibold text-[#111827]">Movimentação registrada!</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-bold text-[#111827] text-base">Registrar Movimentação</h2>
+              <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X size={16} className="text-gray-400" /></button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Tipo */}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Tipo</label>
+                <div className="flex gap-2">
+                  {(["entrada", "saida"] as const).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setType(t)}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl border text-sm font-medium transition-colors",
+                        type === t
+                          ? t === "entrada" ? "bg-green-50 border-green-300 text-green-700" : "bg-red-50 border-red-300 text-red-600"
+                          : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                      )}
+                    >
+                      {t === "entrada" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                      {t === "entrada" ? "Entrada" : "Saída"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Produto */}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Produto</label>
+                <select
+                  value={product}
+                  onChange={(e) => setProduct(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                >
+                  {products.map((p) => (
+                    <option key={p.id} value={p.name}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Tamanho + Quantidade */}
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Tamanho</label>
+                  <select
+                    value={size}
+                    onChange={(e) => setSize(e.target.value as SizeKey)}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                  >
+                    {(["PP","P","M","G","GG"] as const).map((s) => <option key={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Quantidade</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={qty}
+                    onChange={(e) => setQty(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                  />
+                </div>
+              </div>
+
+              {/* Motivo */}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">Motivo</label>
+                <input
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder={type === "entrada" ? "Ex: Reposição fornecedor, Devolução..." : "Ex: Pedido #1090, Avaria..."}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6C3BFF]/20"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                Cancelar
+              </button>
+              <button
+                onClick={submit}
+                disabled={!reason.trim() || Number(qty) < 1}
+                className="flex-1 py-2.5 bg-[#6C3BFF] text-white rounded-xl text-sm font-semibold hover:bg-[#5a2fd6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Registrar
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function EstoquePage() {
+  const [tab, setTab]                     = useState<"estoque" | "movimentacoes">("estoque");
+  const [stockList, setStockList]         = useState<StockItem[]>(initialStock);
+  const [movementList, setMovementList]   = useState<Movement[]>(initialMovements);
+  const [showEntrada, setShowEntrada]     = useState(false);
+  const [reposicaoMsg, setReposicaoMsg]   = useState<string | null>(null);
+
+  const alertItems = stockList.filter((i) => stockStatus(i) === "critico" || stockStatus(i) === "zerado");
+
+  function handleMovement(m: Movement) {
+    setMovementList((prev) => [m, ...prev]);
+    if (m.type === "entrada") {
+      setStockList((prev) => prev.map((item) =>
+        item.name === m.product
+          ? { ...item, sizes: { ...item.sizes, [m.size]: item.sizes[m.size as SizeKey] + m.qty } }
+          : item
+      ));
+    }
+  }
+
+  function requestRestock() {
+    setReposicaoMsg("Solicitação de reposição enviada para o fornecedor via WhatsApp!");
+    setTimeout(() => setReposicaoMsg(null), 3000);
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <Topbar
         title="Estoque"
         subtitle="Controle de produtos por tamanho — Bella Modas"
-        action={{ label: "Registrar Entrada", onClick: () => {} }}
+        action={{ label: "Registrar Entrada", onClick: () => setShowEntrada(true) }}
       />
 
       <div className="flex-1 overflow-y-auto p-6 space-y-5">
@@ -100,7 +267,10 @@ export default function EstoquePage() {
                 {alertItems.map((i) => i.name).join(" · ")}
               </p>
             </div>
-            <button className="text-xs font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0">
+            <button
+              onClick={requestRestock}
+              className="text-xs font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
+            >
               Solicitar Reposição
             </button>
           </div>
@@ -109,10 +279,10 @@ export default function EstoquePage() {
         {/* Summary cards */}
         <div className="grid grid-cols-4 gap-4">
           {[
-            { label: "Total em Estoque",  value: stockItems.reduce((s, i) => s + totalStock(i.sizes), 0), icon: Package,      color: "bg-[#6C3BFF]/10 text-[#6C3BFF]" },
-            { label: "Produtos Ativos",   value: stockItems.filter((i) => totalStock(i.sizes) > 0).length, icon: Package,    color: "bg-green-100 text-[#10B981]" },
+            { label: "Total em Estoque",  value: stockList.reduce((s, i) => s + totalStock(i.sizes), 0), icon: Package,       color: "bg-[#6C3BFF]/10 text-[#6C3BFF]" },
+            { label: "Produtos Ativos",   value: stockList.filter((i) => totalStock(i.sizes) > 0).length, icon: Package,      color: "bg-green-100 text-[#10B981]" },
             { label: "Estoque Crítico",   value: alertItems.length,                                         icon: AlertTriangle, color: "bg-amber-100 text-amber-600" },
-            { label: "Sem Estoque",       value: stockItems.filter((i) => totalStock(i.sizes) === 0).length, icon: TrendingDown, color: "bg-red-100 text-red-500" },
+            { label: "Sem Estoque",       value: stockList.filter((i) => totalStock(i.sizes) === 0).length, icon: TrendingDown, color: "bg-red-100 text-red-500" },
           ].map((s) => (
             <div key={s.label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${s.color}`}>
@@ -165,7 +335,7 @@ export default function EstoquePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {stockItems.map((item) => {
+                {stockList.map((item) => {
                   const total = totalStock(item.sizes);
                   const st = stockStatus(item);
                   const sc = statusLabel[st];
@@ -208,7 +378,7 @@ export default function EstoquePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {movements.map((m) => (
+                {movementList.map((m) => (
                   <tr key={m.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 text-sm font-medium text-[#111827]">{m.product}</td>
                     <td className="px-4 py-3">
@@ -232,6 +402,21 @@ export default function EstoquePage() {
           </div>
         )}
       </div>
+
+      {/* Toast */}
+      {reposicaoMsg && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-[#111827] text-white text-sm px-5 py-3 rounded-xl shadow-xl">
+          {reposicaoMsg}
+        </div>
+      )}
+
+      {showEntrada && (
+        <EntradaModal
+          products={stockList}
+          onClose={() => setShowEntrada(false)}
+          onSubmit={handleMovement}
+        />
+      )}
     </div>
   );
 }
